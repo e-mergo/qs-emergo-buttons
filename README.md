@@ -1,7 +1,7 @@
 ---
 Qlik Sense Visualization Extension
 Name: E-mergo Buttons
-Version: 0.5.20191015
+Version: 1.0.20200622
 QEXT: qs-emergo-buttons.qext
 ---
 
@@ -160,6 +160,9 @@ E-mergo provides paid support through standard support contracts. For other scen
 Requests for additional features can be posted in the extension's GitHub repository. Depending on your own code samples and the availability of E-mergo developers your request may be considered and included.
 
 ## Changelog
+
+#### 1.0.20200622
+- Fixed use of deprecated contentApi service
 
 #### 0.5.20191015
 - Added a safety limit setting of 100 buttons when generating the dynamic button set, to prevent unintended browser memory overload.
