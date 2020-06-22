@@ -1,0 +1,136 @@
+/**
+ * E-mergo Buttons Styles
+ *
+ * @package E-mergo Tools Bundle
+ */
+.qs-emergo-buttons {
+	width: 100%;
+	height: 100%;
+	display: flex;
+	flex-flow: row wrap;
+	overflow-y: auto;
+	overflow-x: hidden;
+}
+
+.qs-emergo-buttons .qs-emergo-buttongroup {
+	display: inline-block;
+	vertical-align: middle;
+	font-size: 0;
+}
+
+.qs-emergo-buttons.horizontal.full-width .qs-emergo-buttongroup {
+	display: flex;
+	flex-flow: row wrap;
+}
+
+.qs-emergo-buttons.vertical .qs-emergo-buttongroup {
+	display: flex;
+	flex-flow: column nowrap;
+}
+
+.qs-emergo-buttons.vertical.align-left .qs-emergo-buttongroup {
+	align-items: flex-start;
+}
+
+.qs-emergo-buttons.vertical.align-center .qs-emergo-buttongroup {
+	align-items: center;
+}
+
+.qs-emergo-buttons.vertical.align-right .qs-emergo-buttongroup {
+	align-items: flex-end;
+}
+
+.qs-emergo-buttons.full-width .qs-emergo-buttongroup,
+.qs-emergo-buttons.vertical.full-width .qs-emergo-buttongroup .lui-button {
+	width: 100%;
+}
+
+.qs-emergo-buttons .qs-emergo-buttongroup .lui-button {
+	margin: 0px;
+	height: auto;
+}
+
+.qs-emergo-buttons .qs-emergo-buttongroup .lui-button .lui-icon {
+	font-size: 12px;
+}
+
+.qs-emergo-buttons .qs-emergo-buttongroup .lui-button .lui-icon.lui-icon-start {
+	margin-right: 2px;
+}
+
+.qs-emergo-buttons .qs-emergo-buttongroup .lui-button .lui-icon.lui-icon-between {
+	margin: 0px 2px;
+}
+
+.qs-emergo-buttons .qs-emergo-buttongroup .lui-button .lui-icon.lui-icon-end {
+	margin-left: 2px;
+}
+
+.qs-emergo-buttons.horizontal.full-width .qs-emergo-buttongroup .lui-button {
+	flex: 1 auto;
+}
+
+.qs-emergo-buttons.horizontal.with-spacing .qs-emergo-buttongroup .lui-button {
+	margin: 5px;
+}
+
+.qs-emergo-buttons.horizontal.with-spacing .qs-emergo-buttongroup .lui-button:first-child {
+	margin-left: 0px;
+}
+
+.qs-emergo-buttons.horizontal.with-spacing .qs-emergo-buttongroup .lui-button:last-child {
+	margin-right: 0px;
+}
+
+.qs-emergo-buttons.vertical .qs-emergo-buttongroup .lui-button {
+	display: block;
+}
+
+.qs-emergo-buttons.vertical.with-spacing .qs-emergo-buttongroup .lui-button {
+	margin: 5px 0px;
+}
+
+.qs-emergo-buttons.vertical.with-spacing .qs-emergo-buttongroup .lui-button:first-child {
+	margin-top: 0px;
+}
+
+.qs-emergo-buttons.vertical.with-spacing .qs-emergo-buttongroup .lui-button:last-child {
+	margin-bottom: 0px;
+}
+
+.lui-button--custom {
+	border: 0;
+	padding: 1px 17px;
+	box-shadow: inset 0 -2px rgba(0,0,0,.1);
+	transition: box-shadow .2s ease-out;
+}
+
+.lui-button--custom-inverse {
+	color: #fff;
+	border: 0;
+	padding: 1px 17px;
+	box-shadow: inset 0 -2px rgba(0,0,0,.1);
+	transition: box-shadow .2s ease-out;
+}
+
+.lui-button--custom.lui-focused, .lui-button--custom:focus,
+.lui-button--custom-inverse.lui-focused, .lui-button--custom-inverse:focus {
+	padding: 0 16px;
+	border: 1px solid #52a2cc;
+}
+
+.lui-button--custom.lui-active, .lui-button--custom:active,
+.lui-button--custom-inverse.lui-active, .lui-button--custom-inverse:active {
+	border: 1px solid transparent;
+	padding: 0 16px;
+	color: #fff;
+	background-color: rgba(0,0,0,.65) !important;
+	box-shadow: 0 1px 0 hsla(0,0%,100%,.25);
+}
+
+.lui-button--custom.lui-hovered, .lui-button--custom:hover,
+.lui-button--custom-inverse.lui-hovered, .lui-button--custom-inverse:hover {
+	box-shadow: inset 0 -2px rgba(0,0,0,.1), inset 0 0 0 250px hsla(0,0%,100%,.2);
+}
+
+/*.qv-object-emergo-buttons .*/
