@@ -1,7 +1,7 @@
 /**
  * E-mergo Actions Utility Library
  *
- * @version 20191018
+ * @version 20200622
  * @author Laurens Offereins <https://github.com/lmoffereins>
  *
  * @param  {Object} qlik       Qlik's core API
@@ -30,11 +30,6 @@ define([
 	util,
 	translator
 ) {
-
-	// For debugging purposes
-	window.qlik = qlik;
-	window.qvangular = qvangular;
-	window.util = util;
 
 	/**
 	 * Holds the reference to the current app's API
