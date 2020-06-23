@@ -9,7 +9,7 @@ QEXT: qs-emergo-buttons.qext
 
 **E-mergo Buttons** is a Qlik Sense visualization extension developed by [E-mergo](https://www.e-mergo.nl). This extension enables the dashboard designer to insert customizable buttons with a variety of actions to trigger. Unlike Qlik's own visualizations, with this extension you can create multiple buttons in a single visualization object, using various layout options. Other added features are custom button colors, conditional show, multiple actions, and some new actions as well.
 
-This extension is part of the [E-mergo Tools bundle](https://www.e-mergo.nl/e-mergo-tools-bundle).
+This extension is part of the [E-mergo Tools bundle](https://www.e-mergo.nl/e-mergo-tools-bundle/?utm_medium=download&utm_source=tools_bundle&utm_campaign=E-mergo_Extension&utm_term=toolsbundle&utm_content=sitelink).
 
 This extension is [hosted on GitHub](https://github.com/emergo/qs-emergo-buttons). You can report bugs and discuss features on the [issues page](https://github.com/emergo/qs-emergo-buttons/issues).
 
