@@ -3,6 +3,8 @@
  *
  * @since 20190802
  * @author Laurens Offereins <https://www.github.com/lmoffereins>
+ *
+ * @version 20200623
  */
 (function( window, $, _ ) {
 
@@ -50,7 +52,7 @@
 		$("body").addClass("error-file-not-found");
 
 		// Setup content
-		setupDocContent("## Oops, something went wrong\nThe file containing the extension's documentation named `README.md` could not be loaded.\n\nPlease try to open the extension's documentation once with a RootAdmin account or choose one of the following:\n\n- Open the [README.md](../README.md) file directly\n - Refer to the original extension repository on GitHub\n- Visit https://www.e-mergo.nl/e-mergo-tools-bundle for more information");
+		setupDocContent("## Oops, something went wrong\nThe file containing the extension's documentation named `README.md` could not be loaded.\n\nPlease try to open the extension's documentation once with a RootAdmin account or choose one of the following:\n\n- Open the [README.md](../README.md) file directly\n - Refer to the original extension repository on GitHub\n- Visit [https://www.e-mergo.nl/e-mergo-tools-bundle](https://www.e-mergo.nl/e-mergo-tools-bundle/?utm_medium=download&utm_source=tools_bundle&utm_campaign=E-mergo_Extension&utm_term=toolsbundle&utm_content=sitelink) for more information");
 	});
 
 	/**
