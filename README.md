@@ -1,7 +1,7 @@
 ---
 Qlik Sense Visualization Extension
 Name: E-mergo Buttons
-Version: 1.0.20200622
+Version: 1.0.20200623
 QEXT: qs-emergo-buttons.qext
 ---
 
@@ -160,6 +160,9 @@ E-mergo provides paid support through standard support contracts. For other scen
 Requests for additional features can be posted in the extension's GitHub repository. Depending on your own code samples and the availability of E-mergo developers your request may be considered and included.
 
 ## Changelog
+
+#### 1.0.20200623
+- Updated docs files
 
 #### 1.0.20200622
 - Fixed use of deprecated contentApi service

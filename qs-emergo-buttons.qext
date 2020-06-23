@@ -2,7 +2,7 @@
 	"name": "E-mergo Buttons",
 	"type": "visualization",
 	"author": "Laurens Offereins, E-mergo",
-	"version": "1.0.20200622",
+	"version": "1.0.20200623",
 	"description": "Buttons for advanced actions and navigation.",
 	"preview": "logo-emergo.png",
 	"license": "MIT License",
