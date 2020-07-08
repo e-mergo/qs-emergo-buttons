@@ -1,7 +1,7 @@
 /**
  * E-mergo Actions Utility Library
  *
- * @version 20200622
+ * @version 20200708
  * @author Laurens Offereins <https://github.com/lmoffereins>
  *
  * @param  {Object} qlik       Qlik's core API
@@ -254,8 +254,6 @@ define([
 	/**
 	 * Apply field selection
 	 *
-	 * @todo  Use SelectListObjectValues which works with one-selected-value
-	 *
 	 * @param  {Object}  item    Action
 	 * @param  {String}  context Action context or visualization scope
 	 * @return {Promise}         Action done
@@ -264,9 +262,15 @@ define([
 		var state = getAlternateState(item, context), values = [];
 
 		if (item.value) {
-			values = item.value.split(";").map( function( value ) {
-				return isNaN(value) ? value : Number(value);
-			});
+
+			// Select number equivalent in case of Dual values
+			if (item.value.hasOwnProperty("qText")) {
+				values.push(item.value.qNum !== "NaN" ? item.value.qNum : item.value.qText);
+			} else {
+				values = item.value.split(";").map( function( value ) {
+					return isNaN(value) ? value : Number(value);
+				});
+			}
 		}
 
 		return item.field
@@ -387,7 +391,7 @@ define([
 							? ((0 === index || -1 === index) ? items.length : index) - 1
 							// Select next value
 							: (((items.length - 1 === index || -1 === index)) ? -1 : index) + 1
-						][0].qText
+						][0]
 					}, context));
 				});
 			});
