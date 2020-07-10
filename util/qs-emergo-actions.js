@@ -1,7 +1,7 @@
 /**
  * E-mergo Actions Utility Library
  *
- * @version 20200708
+ * @version 20200710
  * @author Laurens Offereins <https://github.com/lmoffereins>
  *
  * @param  {Object} qlik       Qlik's core API
@@ -200,6 +200,11 @@ define([
 		label: "Apply Theme",
 		value: "applyTheme",
 		showTheme: true
+	}, {
+		label: "Log to Console",
+		value: "logToConsole",
+		valueLabel: "Expression",
+		showValue: true
 	// }, {
 	// 	label: "Set Language",
 	// 	value: "setLanguage",
@@ -1142,6 +1147,16 @@ define([
 	},
 
 	/**
+	 * Log a value to the console
+	 *
+	 * @param  {Object}  item Action
+	 * @return {Void}
+	 */
+	logToConsole = function( item ) {
+		console.log(item.value);
+	},
+
+	/**
 	 * Set the language
 	 *
 	 * @inactive Should be used _before_ opening an app.
@@ -1181,7 +1196,10 @@ define([
 		startReloadTask: startReloadTask,
 
 		// Theme
-		applyTheme: applyTheme
+		applyTheme: applyTheme,
+
+		// Other
+		logToConsole: logToConsole
 	},
 
 	/**
@@ -1725,7 +1743,9 @@ define([
 			}
 		},
 		value: {
-			label: "Value",
+			label: function( item ) {
+				return getProperty(item, "valueLabel") || "Value";
+			},
 			type: "string",
 			expression: "optional",
 			ref: "value",
