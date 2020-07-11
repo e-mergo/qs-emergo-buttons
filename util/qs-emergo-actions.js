@@ -1,7 +1,7 @@
 /**
  * E-mergo Actions Utility Library
  *
- * @version 20200710
+ * @version 20200711
  * @author Laurens Offereins <https://github.com/lmoffereins>
  *
  * @param  {Object} qlik       Qlik's core API
@@ -1816,23 +1816,27 @@ define([
 			 * @param  {Object} item The item's layout
 			 * @return {Array}
 			 */
-			options: function( item ) {
+			options: (function() {
 				/**
-				 * In an `options` method, the initial call has the correct
-				 * `item` parameter as the item's layout. In subsequent calls,
-				 * the first parameter is replaced by the global extension layout.
-				 * To fix this, the parameter is stored in the method's context
-				 * `this` as per the initial call, when `item` is correct. The
-				 * subsuquent calls will use this stored version.
+				 * In the `options` method the initial call has the correct
+				 * `item` parameter as the item's layout. However in subsequent
+				 * calls the first parameter is replaced by the global extension
+				 * layout. It contains all registered items, so there is no
+				 * telling which item to get the options from. This is a bug in QS.
+				 *
+				 * To fix this, the parameter is stored in a separate variable
+				 * within a closure. The first and subsequent calls will then use
+				 * this stored version of the item.
 				 */
-				if (item.cId) {
-					this.emergoActionsEitherOrOptionsItem = item;
-				} else {
-					item = this.emergoActionsEitherOrOptionsItem;
-				}
+				var _item;
+				return function( item ) {
+					if ("undefined" === typeof _item) {
+						_item = item;
+					}
 
-				return getProperty(item, "eitherOrOptions") || [false, true];
-			},
+					return getProperty(_item, "eitherOrOptions") || [false, true];
+				};
+			})(),
 			show: function( item ) {
 				var show = showProperty(item, "eitherOrOptions");
 

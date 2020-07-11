@@ -150,9 +150,6 @@ Select in which corner position the buttons should be positioned. Or center the 
 
 ## FAQ
 
-### What are the known issues?
-- 20190909.1 In the extension's property panel, when selecting an app's sheet to navigate to, the incorrect sheets may be listed. This happens when multiple buttons in a single visualization object use Navigate to Dashboard. A fix is expected in QS November 2019.
-
 ### Can I get support for this extension?
 E-mergo provides paid support through standard support contracts. For other scenarios, you can post your bugs or questions in the extension's GitHub repository.
 
