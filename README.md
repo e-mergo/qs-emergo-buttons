@@ -11,7 +11,7 @@ QEXT: qs-emergo-buttons.qext
 
 This extension is part of the [E-mergo Tools bundle](https://www.e-mergo.nl/e-mergo-tools-bundle/?utm_medium=download&utm_source=tools_bundle&utm_campaign=E-mergo_Extension&utm_term=toolsbundle&utm_content=sitelink).
 
-This extension is [hosted on GitHub](https://github.com/emergo/qs-emergo-buttons). You can report bugs and discuss features on the [issues page](https://github.com/emergo/qs-emergo-buttons/issues).
+This extension is [hosted on GitHub](https://github.com/e-mergo/qs-emergo-buttons). You can report bugs and discuss features on the [issues page](https://github.com/e-mergo/qs-emergo-buttons/issues).
 
 ## Why is this extension needed?
 As per version November 2018, Qlik Sense ships with the *Qlik Dashboard bundle* for 'advanced authoring'. The bundle contains the *Button for navigation* and *Variable input* extensions, both forks of their respective open-source community productions. These extensions however have their limits:
@@ -106,7 +106,7 @@ This action starts a reload of the current app. The reload is started instantly.
 - **Close on success** When selected, the reload feedback will be closed instantly on reload success. This enables chaining multiple actions after reloading the app.
 
 #### Start Reload Task
-This action starts the specified reload task. When the task is already running, a message will show telling the user. You can pick from a list of available tasks in the current server environment. This functionality allows for starting reload tasks outside of the QMC.
+This action starts the specified reload task from the QMC. When the task is already running, a message will show telling the user. You can pick from a list of available tasks in the current server environment. This functionality allows for starting reload tasks outside of the QMC.
 - **Display progress** When selecting *Enforced*, the user cannot close the modal untill the task execution is done. When selecting *Optional*, the user can close the modal before the task execution is done.
 - **Skip task confirmation** When selected, the task will be started instantly.
 - **Close on success** When selected, the task feedback will be closed instantly on task success. In combination with *Enforced* progress display and *Skip task confirmation* this enables chaining multiple task executions with actions.
@@ -121,6 +121,9 @@ Note that the following requirements apply:
 
 #### Apply Theme
 This action sets the current Qlik Sense visual theme to the specified theme. You can pick from a list of available themes in the current app. This functionality allows for theme-switching for use cases like font-scaling, different color tones, etcetera.
+
+#### Log to Console
+This action logs the result of the provided expression to the browser's console. This functionality is provided for debugging purposes.
 
 ### Navigation
 After all triggered actions are successfully handled, a navigation action may kick in to move the user to a different location. The following navigation options are available:
