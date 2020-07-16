@@ -47,7 +47,20 @@
 
 .qs-emergo-buttons .qs-emergo-buttongroup .lui-button {
 	margin: 0px;
+	padding: 0px;
 	height: 30px;
+}
+
+.qs-emergo-buttons .qs-emergo-buttongroup .lui-button .title-wrapper {
+	width: 100%;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+}
+
+.qs-emergo-buttons .qs-emergo-buttongroup .lui-button .title-wrapper .title {
+	flex: 1 1 auto;
+	padding: 0 17px;
 }
 
 .qs-emergo-buttons .qs-emergo-buttongroup .lui-button .lui-icon {
