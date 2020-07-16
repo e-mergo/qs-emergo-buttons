@@ -111,7 +111,7 @@ define([
 
 			classes.push(this.layout.props.buttonLayout.orientation ? "vertical" : "horizontal");
 			classes.push("100%" === this.layout.props.buttonLayout.width ? "full-width" : "auto-width");
-			classes.push(this.layout.props.buttonLayout.noSpacing ? "with-spacing" : "without-spacing");
+			classes.push(this.layout.props.buttonLayout.noSpacing ? "spacing" : "nospacing");
 			classes.push(aligns[this.layout.props.buttonLayout.position % 3]);
 
 			return classes;

@@ -51,6 +51,10 @@
 	height: 30px;
 }
 
+.qs-emergo-buttons.horizontal.nospacing .qs-emergo-buttongroup .lui-button:not(:last-child) {
+	margin-right: -1px;
+}
+
 .qs-emergo-buttons .qs-emergo-buttongroup .lui-button .title-wrapper {
 	width: 100%;
 	display: flex;
@@ -83,15 +87,15 @@
 	flex: 1 auto;
 }
 
-.qs-emergo-buttons.horizontal.with-spacing .qs-emergo-buttongroup .lui-button {
+.qs-emergo-buttons.horizontal.spacing .qs-emergo-buttongroup .lui-button {
 	margin: 5px;
 }
 
-.qs-emergo-buttons.horizontal.with-spacing .qs-emergo-buttongroup .lui-button:first-child {
+.qs-emergo-buttons.horizontal.spacing .qs-emergo-buttongroup .lui-button:first-child {
 	margin-left: 0px;
 }
 
-.qs-emergo-buttons.horizontal.with-spacing .qs-emergo-buttongroup .lui-button:last-child {
+.qs-emergo-buttons.horizontal.spacing .qs-emergo-buttongroup .lui-button:last-child {
 	margin-right: 0px;
 }
 
@@ -99,15 +103,15 @@
 	display: block;
 }
 
-.qs-emergo-buttons.vertical.with-spacing .qs-emergo-buttongroup .lui-button {
+.qs-emergo-buttons.vertical.spacing .qs-emergo-buttongroup .lui-button {
 	margin: 5px 0px;
 }
 
-.qs-emergo-buttons.vertical.with-spacing .qs-emergo-buttongroup .lui-button:first-child {
+.qs-emergo-buttons.vertical.spacing .qs-emergo-buttongroup .lui-button:first-child {
 	margin-top: 0px;
 }
 
-.qs-emergo-buttons.vertical.with-spacing .qs-emergo-buttongroup .lui-button:last-child {
+.qs-emergo-buttons.vertical.spacing .qs-emergo-buttongroup .lui-button:last-child {
 	margin-bottom: 0px;
 }
 
