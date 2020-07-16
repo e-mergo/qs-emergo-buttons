@@ -273,6 +273,12 @@ define([
 						expression: "optional",
 						ref: "label"
 					},
+					description: {
+						translation: "Common.Description",
+						type: "string",
+						expression: "optional",
+						ref: "description"
+					},
 					calcCond: {
 						label: "Show button if",
 						type: "string",
