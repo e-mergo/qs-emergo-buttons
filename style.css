@@ -67,6 +67,13 @@
 	padding: 0 17px;
 }
 
+.qs-emergo-buttons .qs-emergo-buttongroup .lui-button.lui-focused .title-wrapper .title,
+.qs-emergo-buttons .qs-emergo-buttongroup .lui-button:focus .title-wrapper .title,
+.qs-emergo-buttons .qs-emergo-buttongroup .lui-button.lui-active .title-wrapper .title,
+.qs-emergo-buttons .qs-emergo-buttongroup .lui-button:active .title-wrapper .title {
+	padding: 0 16px;
+}
+
 .qs-emergo-buttons .qs-emergo-buttongroup .lui-button .lui-icon {
 	font-size: 12px;
 }
