@@ -66,8 +66,14 @@ When the returned set of buttons from the expression is too large, the extension
 ### Label (Icons)
 Button labels are parsed for icons that match existing ones in Qlik's own icon set. An icon is matched on the following definition: `#icon-name#`. The icon name is the part of an icon's class name without the `lui-icon--` prefix. The available icons are listed in the provided <a href="../lib/icons-lui.json" target="_blank">JSON file</a>.
 
+### Description
+Button descriptions are applied as the button's `title` HTML atribute. It is shown when hovering the button.
+
 ### Show button if
-Works like conditional show in the Table and Pivot Table visualizations. Using the expression field for conditional show, the button can be shown depending on a measure's value, a variable's value or any other comparison. Return a non-zero, non-empty value to hide the button, otherwise the button is shown.
+Works like conditional show in the Table and Pivot Table visualizations. Using the expression field for conditional show, the button can be shown depending on a measure's value, a variable's value or any other comparison. Return a non-empty falsey value (usually zero) to hide the button, otherwise the button is shown.
+
+### Enable button if
+Like `Show button if`, this setting provides a way to dynamically enable/disable the button. Using the expression field for conditional enabling, the button can be disabled depending on a measure's value, a variable's value or any other comparison. Return a non-empty falsey value (usually zero) to disable the button, otherwise the button is enabled.
 
 ### Color
 Setting the button's color can be done in three ways:
