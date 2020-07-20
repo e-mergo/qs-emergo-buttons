@@ -1,6 +1,6 @@
 <div class="qs-emergo-buttons" ng-style="listStyle()" ng-class="listClass()">
 	<div class="qs-emergo-buttongroup" ng-class="{'lui-buttongroup': !layout.props.buttonLayout.orientation && !layout.props.buttonLayout.noSpacing}">
-		<lui-button ng-id="button.cId" qva-activate="do(button)" ng-repeat="button in btns()" ng-class="btnClass(button)" ng-style="btnStyle(button)" ng-if="btnVisible(button)" ng-disabled="disabled">
+		<lui-button ng-repeat="button in btns()" ng-id="button.cId" qva-activate="do(button)" ng-class="btnClass(button)" ng-style="btnStyle(button)" ng-if="btnVisible(button)" ng-disabled="btnDisabled(button)">
 			<div class="title-wrapper">
 				<span class="title" ng-attr-title="{{button.description}}" ng-bind-html="btnLabel(button)"></span>
 			</div>

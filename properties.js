@@ -72,6 +72,12 @@ define([
 				expression: "optional",
 				ref: "visible"
 			},
+			enabled: {
+				label: "Enable button if",
+				type: "string",
+				expression: "optional",
+				ref: "enabled"
+			},
 			styleType: {
 				label: "Color",
 				type: "string",
@@ -284,6 +290,12 @@ define([
 						type: "string",
 						expression: "optional",
 						ref: "visible"
+					},
+					enabled: {
+						label: "Enable button if",
+						type: "string",
+						expression: "optional",
+						ref: "enabled"
 					},
 					colorExpression: {
 						label: "Color expression",

@@ -214,6 +214,16 @@ define([
 		};
 
 		/**
+		 * Return whether the button is disabled
+		 *
+		 * @param  {Object}  button Button data
+		 * @return {Boolean}        Is the button disabled?
+		 */
+		$scope.btnDisabled = function( button ) {
+			return ! ("" === button.enabled || isNaN(parseInt(button.enabled)) || !! parseInt(button.enabled)) || $scope.disabled;
+		};
+
+		/**
 		 * Return button label
 		 *
 		 * Parses the label for icons.
