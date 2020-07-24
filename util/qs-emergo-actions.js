@@ -245,6 +245,50 @@ define([
 	},
 
 	/**
+	 * Return the item's field
+	 *
+	 * @param  {Object} item  Action item
+	 * @param  {Object} state Context state
+	 * @param  {Function} callback Callback to run when the field was found
+	 * @param  {Function} errorCallback Callback to run when the field was not found
+	 * @return {Promise} The field when it exists
+	 */
+	getField = function( item, state, callback, errorCallback ) {
+		var dfd = $q.defer(), field = app.field(item.field, state), result;
+
+		// Define the default callback
+		if ("undefined" === typeof errorCallback) {
+			errorCallback = _.noop;
+		}
+
+		// The Promise of field.waitFor does not get resolved nor rejected when
+		// the item.field is not a valid field name in the app. To make sure that
+		// the field can properly be evaluated, we apply a delay before evaluation
+		// to make sure that the API request must have returned any value.
+		setTimeout(function() {
+			if (! field.field) {
+				showActionFeedback({
+					title: "Invalid field",
+					message: "The field named '" + field.fldname + "' does not exist. Please make sure the relevant expression generates an existing field name."
+				}).closed.then(errorCallback).then(dfd.resolve);
+			} else {
+
+				// Run callback with field data
+				if ("function" === typeof callback) {
+					result = callback(field);
+				}
+
+				// Resolve when callback is run
+				(result && result.then ? result : $q.resolve()).then( function() {
+					dfd.resolve(field);
+				});
+			}
+		}, 120);
+
+		return dfd.promise;
+	},
+
+	/**
 	 * Apply bookmark
 	 *
 	 * @param  {Object}  item Action
@@ -278,9 +322,13 @@ define([
 			}
 		}
 
-		return item.field
-			? app.field(item.field, state)[item.eitherOr ? "toggleSelect" : "selectValues"](item.eitherOr ? String(values[0]) : values, false)
-			: $q.resolve();
+		if (item.field) {
+			return getField(item, state, function( field ) {
+				return field[item.eitherOr ? "toggleSelect" : "selectValues"](item.eitherOr ? String(values[0]) : values, false);
+			});
+		} else {
+			return $q.resolve();
+		}
 	},
 
 	/**
@@ -295,9 +343,13 @@ define([
 	clearSelection = function( item, context ) {
 		var state = getAlternateState(item, context);
 
-		return item.field
-			? app.field(item.field, state)[item.eitherOr ? "clearOther" : "clear"]()
-			: app.clearAll(false, state);
+		if (item.field) {
+			return getField(item, state, function( field ) {
+				return field[item.eitherOr ? "clearOther" : "clear"]();
+			});
+		} else {
+			return app.clearAll(false, state);
+		}
 	},
 
 	/**
@@ -322,9 +374,13 @@ define([
 	lockField = function( item, context ) {
 		var state = getAlternateState(item, context);
 
-		return item.field
-			? app.field(item.field, state)[item.eitherOr ? "unlock" : "lock"]()
-			: app[item.eitherOr ? "unlockAll" : "lockAll"](state);
+		if (item.field) {
+			return getField(item, state, function( field ) {
+				return field[item.eitherOr ? "unlock" : "lock"]();
+			});
+		} else {
+			return app[item.eitherOr ? "unlockAll" : "lockAll"](state);
+		}
 	},
 
 	/**
@@ -335,7 +391,7 @@ define([
 	 * @return {Promise}         Action done
 	 */
 	selectAdjacent = function( item, context ) {
-		var dfd = $q.defer(), items, selected, index, state = getAlternateState(item, context),
+		var dfd = $q.defer(), state = getAlternateState(item, context),
 
 		// Setup the list definition
 		def = {
@@ -354,51 +410,58 @@ define([
 
 		if (item.field) {
 
-			// Add custom sorting logic
-			if (item.sortExpression) {
-				desc = 0 === item.sortExpression.indexOf("-");
-				def.qDef.qSortCriterias = [{
-					qSortByExpression: parseInt(item.sortOrder) || 1,
-					qExpression: {
-						qv: (0 === item.sortExpression.indexOf("=") ? "" : "=") + item.sortExpression
-					}
-				}];
-			}
+			// Make sure the field exists
+			getField(item, state, function() {
 
-			/**
-			 * Use `app.createList()` instead of `app.field().getData()` because
-			 * the latter does not identify alternative selectable values.
-			 */
-			app.createList(def, function( list ) {
+				// Add custom sorting logic
+				if (item.sortExpression) {
+					desc = 0 === item.sortExpression.indexOf("-");
+					def.qDef.qSortCriterias = [{
+						qSortByExpression: parseInt(item.sortOrder) || 1,
+						qExpression: {
+							qv: (0 === item.sortExpression.indexOf("=") ? "" : "=") + item.sortExpression
+						}
+					}];
+				}
 
-				// Remove updates for this session object before going forward
-				app.destroySessionObject(list.qInfo.qId).then( function() {
+				/**
+				 * Use `app.createList()` instead of `app.field().getData()` because
+				 * the latter does not identify alternative selectable values.
+				 */
+				app.createList(def, function( list ) {
 
-					// Get all available values
-					items = list.qListObject.qDataPages[0].qMatrix.filter( function( row ) {
-						return "X" !== row[0].qState;
+					// Remove updates for this session object before going forward
+					app.destroySessionObject(list.qInfo.qId).then( function() {
+						var items, selected, index;
+
+						// Get all available values
+						items = list.qListObject.qDataPages[0].qMatrix.filter( function( row ) {
+							return "X" !== row[0].qState;
+						});
+
+						// Get all selected values
+						selected = items.filter( function( row ) {
+							return "S" === row[0].qState;
+						});
+
+						// Get selected index to start from
+						index = items.indexOf(selected[item.eitherOr ? 0 : selected.length - 1]);
+
+						// Apply selection and return its promise
+						dfd.resolve(applySelection({
+							state: state,
+							field: item.field,
+							value: items[item.eitherOr
+								// Select previous value
+								? ((0 === index || -1 === index) ? items.length : index) - 1
+								// Select next value
+								: (((items.length - 1 === index || -1 === index)) ? -1 : index) + 1
+							][0]
+						}, context));
 					});
-
-					// Get all selected values
-					selected = items.filter( function( row ) {
-						return "S" === row[0].qState;
-					});
-
-					// Get selected index to start from
-					index = items.indexOf(selected[item.eitherOr ? 0 : selected.length - 1]);
-
-					// Apply selection and return its promise
-					dfd.resolve(applySelection({
-						state: state,
-						field: item.field,
-						value: items[item.eitherOr
-							// Select previous value
-							? ((0 === index || -1 === index) ? items.length : index) - 1
-							// Select next value
-							: (((items.length - 1 === index || -1 === index)) ? -1 : index) + 1
-						][0]
-					}, context));
 				});
+			}, function() {
+				dfd.resolve();
 			});
 		} else {
 			dfd.resolve();
@@ -417,9 +480,13 @@ define([
 	selectAll = function( item, context ) {
 		var state = getAlternateState(item, context);
 
-		return item.field
-			? app.field(item.field, state).selectAll()
-			: $q.resolve();
+		if (item.field) {
+			return getField(item, state, function( field ) {
+				return field.selectAll();
+			});
+		} else {
+			return $q.resolve();
+		}
 	},
 
 	/**
@@ -432,9 +499,13 @@ define([
 	selectExcluded = function( item, context ) {
 		var state = getAlternateState(item, context);
 
-		return item.field
-			? app.field(item.field, state).selectExcluded()
-			: $q.resolve();
+		if (item.field) {
+			return getField(item, state, function( field ) {
+				return field.selectExcluded();
+			});
+		} else {
+			return $q.resolve();
+		}
 	},
 
 	/**
@@ -447,9 +518,13 @@ define([
 	selectPossible = function( item, context ) {
 		var state = getAlternateState(item, context);
 
-		return item.field
-			? app.field(item.field, state).selectPossible()
-			: $q.resolve();
+		if (item.field) {
+			return getField(item, state, function( field ) {
+				return field.selectPossible();
+			});
+		} else {
+			return $q.resolve();
+		}
 	},
 
 	/**
@@ -462,9 +537,13 @@ define([
 	selectAlternative = function( item, context ) {
 		var state = getAlternateState(item, context);
 
-		return item.field
-			? app.field(item.field, state).selectAlternative()
-			: $q.resolve();
+		if (item.field) {
+			return getField(item, state, function( field ) {
+				return field.selectAlternative();
+			});
+		} else {
+			return $q.resolve();
+		}
 	},
 
 	/**
@@ -478,72 +557,78 @@ define([
 		var dfd = $q.defer(), added = 0, threshold, selection = [], state = getAlternateState(item, context);
 
 		if (item.field && item.value) {
-			/**
-			 * Create a cube when the action is run instead of instantly on the item's
-			 * property data (like normal visualizations do using a hypercube). This way,
-			 * there's no constant updating of hypercube data, but only a single fetch.
-			 * The cube is immediately destroyed after it is received.
-			 */
-			app.createCube({
-				qStateName: state,
-				qDimensions: [{
-					qDef: {
-						qFieldDefs: [item.field]
-					}
-				}],
-				qMeasures: [{
-					qDef: {
-						qDef: (0 === item.value.indexOf("=") ? "" : "=") + item.value
-					}
-				}],
-				qInitialDataFetch: [{
-					qTop: 0,
-					qLeft: 0,
-					qWidth: 2,
-					qHeight: 5000
-				}]
-			}, function( cube ) {
 
-				// Remove updates for this session object before going forward
-				app.destroySessionObject(cube.qInfo.qId).then( function() {
-
-					// Get threshold value to match. Get the total value for all rows and take the threshold's part.
-					threshold = cube.qHyperCube.qDataPages[0].qMatrix.reduce( function( a, b ) {
-						return a + b[1].qNum;
-					}, 0) * (item.threshold / 100);
-
-					// Add measure values descendingly up to the threshold
-					cube.qHyperCube.qDataPages[0].qMatrix.sort(sortHypercubeByNumDesc).some( function( i ) {
-
-						// Skip null values
-						if (i[0].qIsNull) {
-							return false;
+			// Make sure the field exists
+			getField(item, state, function() {
+				/**
+				 * Create a cube when the action is run instead of instantly on the item's
+				 * property data (like normal visualizations do using a hypercube). This way,
+				 * there's no constant updating of hypercube data, but only a single fetch.
+				 * The cube is immediately destroyed after it is received.
+				 */
+				app.createCube({
+					qStateName: state,
+					qDimensions: [{
+						qDef: {
+							qFieldDefs: [item.field]
 						}
+					}],
+					qMeasures: [{
+						qDef: {
+							qDef: (0 === item.value.indexOf("=") ? "" : "=") + item.value
+						}
+					}],
+					qInitialDataFetch: [{
+						qTop: 0,
+						qLeft: 0,
+						qWidth: 2,
+						qHeight: 5000
+					}]
+				}, function( cube ) {
 
-						// Add next measure value
-						added += i[1].qNum;
+					// Remove updates for this session object before going forward
+					app.destroySessionObject(cube.qInfo.qId).then( function() {
 
-						// Bail when reaching the defined threshold
-						if (added >= threshold) {
+						// Get threshold value to match. Get the total value for all rows and take the threshold's part.
+						threshold = cube.qHyperCube.qDataPages[0].qMatrix.reduce( function( a, b ) {
+							return a + b[1].qNum;
+						}, 0) * (item.threshold / 100);
 
-							// Add the last item when including the threshold
-							if (added > threshold && false !== item.includeThreshold) {
-								selection.push(i[0].qText);
+						// Add measure values descendingly up to the threshold
+						cube.qHyperCube.qDataPages[0].qMatrix.sort(sortHypercubeByNumDesc).some( function( i ) {
+
+							// Skip null values
+							if (i[0].qIsNull) {
+								return false;
 							}
 
-							return true;
-						}
+							// Add next measure value
+							added += i[1].qNum;
 
-						selection.push(i[0].qText);
+							// Bail when reaching the defined threshold
+							if (added >= threshold) {
+
+								// Add the last item when including the threshold
+								if (added > threshold && false !== item.includeThreshold) {
+									selection.push(i[0].qText);
+								}
+
+								return true;
+							}
+
+							selection.push(i[0].qText);
+						});
+
+						// Apply selection and return its promise
+						dfd.resolve(applySelection({
+							state: state,
+							field: item.field,
+							value: selection.join(";")
+						}, context));
 					});
-
-					// Apply selection and return its promise
-					dfd.resolve(applySelection({
-						state: state,
-						field: item.field,
-						value: selection.join(";")
-					}, context));
 				});
+			}, function() {
+				dfd.resolve();
 			});
 		} else {
 			showActionFeedback({
