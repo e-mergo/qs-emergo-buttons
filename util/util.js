@@ -681,8 +681,6 @@ define([
 		return prefix + s[0].toUpperCase() + s.substr(1);
 	};
 
-	window.qlikRequest = qlikRequest;
-
 	return {
 		argbToRgb: argbToRgb,
 		booleanFromExpression: booleanFromExpression,
