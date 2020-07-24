@@ -1454,7 +1454,7 @@ define([
 		return item.enabled !== false
 			? "function" === typeof actions[item.action]
 				? actions[item.action](item, context)
-				: $q.reject("E-mergo actions: action handler not found (" + item.action + ")")
+				: $q.reject("E-mergo actions: '" + item.action + "' action handler not found", item)
 			: $q.resolve();
 	},
 
@@ -1469,7 +1469,7 @@ define([
 		return (items.actions || items).map( function( item ) {
 			return doOne.bind(this, item, context);
 		}).reduce( function( promise, fn ) {
-			return promise.then(fn);
+			return promise.then(fn).catch(console.error);
 		}, $q.resolve());
 	},
 
