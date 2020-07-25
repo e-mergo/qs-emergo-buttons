@@ -1,7 +1,7 @@
 /**
  * E-mergo Actions Utility Library
  *
- * @version 20200711
+ * @version 20200725
  * @author Laurens Offereins <https://github.com/lmoffereins>
  *
  * @param  {Object} qlik       Qlik's core API
@@ -1634,6 +1634,48 @@ define([
 	},
 
 	/**
+	 * Return the object in the item's tree for which the property equals
+	 * the provided value.
+	 *
+	 * @param  {Object} item Object tree
+	 * @param  {String} prop Property name
+	 * @param  {Mixed}  value Value to match
+	 * @param  {Array} skip Property names to skip searching
+	 * @return {Object|Boolean} Searched object or False when not found
+	 */
+	findObjByPropValue = function( item, prop, value, skip ) {
+		var obj = false, i;
+
+		// Default to skipping the hypercube definition
+		skip = skip || ["qHyperCubeDef"];
+
+		// Object is found!
+		if (item.hasOwnProperty(prop) && item[prop] === value) {
+			obj = item;
+
+		// Walk item's properties
+		} else {
+			for (i in item) {
+				if (item.hasOwnProperty(i) && -1 === skip.indexOf(i)) {
+					if (Array.isArray(item[i])) {
+						obj = item[i].reduce( function( a, b ) {
+							return a || findObjByPropValue(b, prop, value, skip);
+						}, false);
+					} else if (_.isObject(item[i])) {
+						obj = findObjByPropValue(item[i], prop, value, skip);
+					}
+
+					if (obj) {
+						break;
+					}
+				}
+			}
+		}
+
+		return obj;
+	},
+
+	/**
 	 * Return whether this is the current app
 	 *
 	 * @param  {String}  id App Id
@@ -1909,14 +1951,22 @@ define([
 				 * layout. It contains all registered items, so there is no
 				 * telling which item to get the options from. This is a bug in QS.
 				 *
-				 * To fix this, the parameter is stored in a separate variable
+				 * To fix this, the parameter's id is stored in a separate variable
 				 * within a closure. The first and subsequent calls will then use
-				 * this stored version of the item.
+				 * this stored id to use the correct version of the item.
 				 */
-				var _item;
+				var _cId;
 				return function( item ) {
-					if ("undefined" === typeof _item) {
+					var _item;
+
+					// The actual item is provided. Store its id.
+					if (item.hasOwnProperty("cId")) {
+						_cId = item.cId;
 						_item = item;
+
+					// Find the relevant item by using the stored id
+					} else {
+						_item = findObjByPropValue(item, "cId", _cId);
 					}
 
 					return getProperty(_item, "eitherOrOptions") || [false, true];
