@@ -1,7 +1,7 @@
 /**
  * E-mergo Utility library
  *
- * @version 20200601
+ * @version 20200729
  *
  * @package E-mergo
  *
@@ -37,13 +37,6 @@ define([
 	 * @type {Object}
 	 */
 	app = qlik.currApp(),
-
-	/**
-	 * Holds the currently authenticated user
-	 *
-	 * @type {String}
-	 */
-	authenticatedUser,
 
 	/**
 	 * Translate Qlik's ARGB into rgb data
@@ -237,6 +230,16 @@ define([
 		color = argbToRgb(color) || hexToRgb(color);
 
 		return color ? ((0.299 * color.r + 0.587 * color.g + 0.114 * color.b) / 255) < 0.75 : false;
+	},
+
+	/**
+	 * Return a number from an expression's result
+	 *
+	 * @param  {String}  a Expression's result
+	 * @return {Number}    Does the expression evaluate to a number
+	 */
+	numberFromExpression = function( a ) {
+		return "undefined" !== typeof a && ! isNaN(parseInt(a)) ? parseInt(a) : 0;
 	},
 
 	/**
@@ -689,6 +692,7 @@ define([
 		createCache: createCache,
 		hexToRgb: hexToRgb,
 		isDarkColor: isDarkColor,
+		numberFromExpression: numberFromExpression,
 		parseDynamicParams: parseDynamicParams,
 		qlikRequest: qlikRequest,
 		registerStyle: registerStyle,
