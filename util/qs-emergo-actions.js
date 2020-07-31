@@ -2187,6 +2187,29 @@ define([
 			show: function( item ) {
 				return item.navigation.enabled && -1 !== ["goToAppSheet", "goToURI"].indexOf(item.navigation.action);
 			}
+		},
+		story: {
+			label: "Story",
+			ref: "navigation.story",
+			type: "string",
+			component: "dropdown",
+			options: function() {
+				var dfd = $q.defer();
+
+				app.getList("story", function( items ) {
+					dfd.resolve(items.qAppObjectList.qItems.sort(sortByRank).map( function( a ) {
+						return {
+							label: a.qData.title,
+							value: a.qInfo.qId
+						};
+					}));
+				});
+
+				return dfd.promise;
+			},
+			show: function( item ) {
+				return showProperty(item, "showStory");
+			}
 		}
 	},
 
