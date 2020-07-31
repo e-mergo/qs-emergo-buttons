@@ -377,10 +377,10 @@ define([
 						type: "number",
 						component: "buttongroup",
 						options: [{
-							label: "Horizontal",
+							label: "Horizontal", // translation Common.Horizontal found
 							value: 0
 						}, {
-							label: "Vertical",
+							label: "Vertical", // translation is not found
 							value: 1
 						}],
 						show: function( layout, context ) {

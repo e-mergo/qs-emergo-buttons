@@ -82,7 +82,11 @@ Setting the button's color can be done in three ways:
 3. Returning a color definition from an expression.
 
 ### Actions
-Interacting with a button may trigger one or multiple sequenced actions. The list of actions contains all the current ones present in the extensions provided with the *Qlik Dashboard bundle* shipped with Qlik Sense, and some new ones as well. Note that reordering of actions is not possible due to nested ordering issues. The following actions are available:
+Interacting with a button may trigger one or multiple sequenced actions. The list of actions contains all the current ones present in the extensions provided with the *Qlik Dashboard bundle* shipped with Qlik Sense, and some new ones as well. Note that reordering of actions is not possible due to nested ordering issues of the property panel.
+
+When providing values in an expression, be aware that the setting will first be evaluated before use in the extension. So when providing plain values, make sure to define them *without* a leading `=` or as explicit text surrounded by single quotes. This does apply to settings for field names as well.
+
+The following actions are available:
 - **Apply Bookmark** You can pick from a list of available bookmarks in the current app.
 - **Select Field Value** You can define both the field and the value as a result from an expression. Also, either decide to replace current selections, or add/subtract the selected value in *Toggle* mode. Separate multiple values with a `;`.
 - **Clear Field Selection** When not defining the field, all fields will be cleared.
@@ -102,7 +106,7 @@ This action selects the given field's value that is adjacent to the current sele
 #### Select Pareto Values
 This action selects the given field's values that make up the defined pareto set for the given measure expression. You can decide whether or not to include the threshold value of the pareto set. This functionality is native to QlikView, but is not yet implemented in Qlik Sense.
 - **Field** The dimension field on which to apply the pareto selection.
-- **Value** The measure definition for which to determine the pareto set. The expression should be defined *without* a leading `=`.
+- **Value** The measure definition for which to determine the pareto set. Like all action expressions, the setting will first be evaluated before use in the extension. So when providing plain values, make sure to define them *without* a leading `=` or as explicit text surrounded by single quotes.
 - **Threshold** The size of the pareto set in percentages. The size represents the set of dimension field values that make up the given percentage of the total value of the measure expression. These are the values that will be selected.
 - **Include threshold** Whether the last field that is associated with the pareto set should be selected or not, as it may add to a larger percentage set than the defined threshold value.
 
@@ -167,9 +171,18 @@ Requests for additional features can be posted in the extension's GitHub reposit
 
 ## Changelog
 
+#### 1.2.20200731
+- Added the button's _Description_ setting
+- Added the button's _Enable button if_ setting
+- Added detection of invalid field names in actions
+- Fixed selection of stories for _Start Story_ navigation action
+- Fixed enabling/disabling of individual actions
+- Fixed use of translated labels for settings where possible
+- Fixed button layout to better match the appearance of other common Qlik Sense elements
+
 #### 1.1.20200713
-- Added the Log to Console action
-- Fixed selection of Dual values for the Select Adjacent Value action
+- Added the _Log to Console_ action
+- Fixed selection of Dual values for the _Select Adjacent Value_ action
 
 #### 1.0.20200623
 - Updated docs files
