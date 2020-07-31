@@ -96,6 +96,7 @@ define([
 		showField: true,
 		showValue: true,
 		showState: true,
+		eitherOrLabel: "Selection type",
 		eitherOrOptions: [{
 			label: "Replace",
 			value: false
@@ -108,6 +109,7 @@ define([
 		value: "clearSelection",
 		showField: true,
 		showState: true,
+		eitherOrLabel: "Which field?",
 		eitherOrOptions: [{
 			label: "This",
 			value: false,
@@ -184,6 +186,7 @@ define([
 	}, {
 		label: "Start Reload",
 		value: "startReload",
+		eitherOrLabel: "Reload type",
 		eitherOrOptions: [{
 			label: "Complete",
 			value: false
@@ -1933,6 +1936,9 @@ define([
 			}
 		},
 		eitherOr: {
+			label: function( item ) {
+				return getProperty(item, "eitherOrLabel") || "";
+			},
 			ref: "eitherOr",
 			type: "boolean",
 			component: "buttongroup",
