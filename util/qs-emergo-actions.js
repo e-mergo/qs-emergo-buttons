@@ -1,7 +1,7 @@
 /**
  * E-mergo Actions Utility Library
  *
- * @version 20200725
+ * @version 20200731
  * @author Laurens Offereins <https://github.com/lmoffereins>
  *
  * @param  {Object} qlik       Qlik's core API
@@ -144,10 +144,10 @@ define([
 		showState: true,
 		showSortExpression: true,
 		eitherOrOptions: [{
-			label: "Next",
+			translation: "Tooltip.Next",
 			value: false
 		}, {
-			label: "Previous",
+			translation: "Tooltip.Previous",
 			value: true
 		}]
 	}, {
@@ -1718,7 +1718,7 @@ define([
 			}
 		},
 		field: {
-			label: "Field",
+			translation: "Common.Field",
 			type: "string",
 			expression: "optional", // How is this parsed?
 			ref: "field",
@@ -1727,7 +1727,7 @@ define([
 			}
 		},
 		bookmark: {
-			label: "Bookmark",
+			translation: "Embed.Dialog.ApplyBookmark",
 			type: "string",
 			component: "dropdown",
 			ref: "bookmark",
@@ -1750,7 +1750,7 @@ define([
 			}
 		},
 		variable: {
-			label: "Variable",
+			translation: "Common.Variable",
 			type: "string",
 			ref: "variable",
 			component: "dropdown",
@@ -1847,7 +1847,7 @@ define([
 			}
 		},
 		theme: {
-			label: "Theme",
+			translation: "Embed.Dialog.SetTheme",
 			type: "string",
 			component: "dropdown",
 			ref: "theme",
@@ -1871,7 +1871,7 @@ define([
 		},
 		value: {
 			label: function( item ) {
-				return getProperty(item, "valueLabel") || "Value";
+				return getProperty(item, "valueLabel") || translator.get("ExpressionEditor.Value");
 			},
 			type: "string",
 			expression: "optional",
@@ -1890,10 +1890,10 @@ define([
 
 				return [{
 					value: "",
-					label: "<inherited>"
+					translation: "AlternateState.InheritedState"
 				}, {
 					value: "$",
-					label: "<default-state>"
+					translation: "AlternateState.DefaultState"
 				}].concat(states.map( function( a ) {
 					return {
 						value: a,
@@ -1907,7 +1907,7 @@ define([
 			}
 		},
 		sortExpression: {
-			label: "Sorting",
+			translation: "properties.sorting",
 			type: "string",
 			expression: "optional",
 			ref: "sortExpression",
@@ -2016,18 +2016,18 @@ define([
 			}
 		},
 		enabled: {
-			// label: "Status",
+			translation: "Common.Enabled",
 			ref: "enabled",
 			type: "boolean",
 			component: "switch",
-			defaultValue: true,
 			options: [{
-				label: "Enabled",
+				translation: "properties.on",
 				value: true,
 			}, {
-				label: "Disabled",
+				translation: "properties.off",
 				value: false
-			}]
+			}],
+			defaultValue: true
 		}
 	},
 
@@ -2054,10 +2054,10 @@ define([
 			component: "switch",
 			defaultValue: false,
 			options: [{
-				label: "Enabled",
+				translation: "properties.on",
 				value: true,
 			}, {
-				label: "Disabled",
+				translation: "properties.off",
 				value: false
 			}]
 		},
@@ -2165,7 +2165,7 @@ define([
 			}
 		},
 		value: {
-			label: "Value",
+			translation: "ExpressionEditor.Value",
 			type: "string",
 			expression: "optional",
 			ref: "navigation.value",
@@ -2174,7 +2174,7 @@ define([
 			}
 		},
 		newTab: {
-			label: "Open in new tab",
+			translation: "properties.kpi.openUrlInNewTab",
 			ref: "navigation.newTab",
 			type: "boolean",
 			defaultValue: true,
