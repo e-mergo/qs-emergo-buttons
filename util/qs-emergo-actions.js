@@ -1326,7 +1326,7 @@ define([
 
 		// Signal disabled actions
 		if (! item.enabled) {
-			label = "// " + label;
+			title = "// " + title;
 		}
 
 		return title;
