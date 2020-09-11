@@ -208,6 +208,9 @@ define([
 		value: "logToConsole",
 		valueLabel: "Expression",
 		showValue: true
+	}, {
+		label: "Request confirmation",
+		value: "requestConfirmation"
 	// }, {
 	// 	label: "Set Language",
 	// 	value: "setLanguage",
@@ -1254,6 +1257,31 @@ define([
 	},
 
 	/**
+	 * Display a confirmation dialog
+	 *
+	 * @param  {Object}  item Action
+	 * @return {Promise} Action confirmed or cancelled
+	 */
+	requestConfirmation = function( item ) {
+		var dfd = $q.defer(),
+
+		// Contstruct dialog
+		dialog = showActionFeedback({
+			title: item.modalTitle,
+			message: item.modalContent || ( item.modalTitle ? "" : "Are you sure?" ),
+			okLabel: item.modalOkLabel || translator.get( "Common.OK" ),
+			cancelLabel: item.modalCancelLabel,
+			hideCancelButton: ! item.modalCancelLabel
+		});
+
+		// Resolve the promise on dialog close. Cancelling the modal will
+		// short-circuit the action chain.
+		dialog.closed.then(dfd.resolve);
+
+		return dfd.promise;
+	},
+
+	/**
 	 * Set the language
 	 *
 	 * @inactive Should be used _before_ opening an app.
@@ -1296,7 +1324,8 @@ define([
 		applyTheme: applyTheme,
 
 		// Other
-		logToConsole: logToConsole
+		logToConsole: logToConsole,
+		requestConfirmation: requestConfirmation
 	},
 
 	/**
@@ -2034,6 +2063,46 @@ define([
 			defaultValue: true,
 			show: function( item ) {
 				return item.action === "selectPareto";
+			}
+		},
+		modalTitle: {
+			label: "Modal title",
+			type: "string",
+			expression: "optional",
+			ref: "modalTitle",
+			defaultValue: "Are you sure?",
+			show: function( item ) {
+				return item.action === "requestConfirmation";
+			}
+		},
+		modalContent: {
+			label: "Modal content",
+			type: "string",
+			expression: "optional",
+			ref: "modalContent",
+			defaultValue: "",
+			show: function( item ) {
+				return item.action === "requestConfirmation";
+			}
+		},
+		modalCancelLabel: {
+			label: "Cancel label",
+			type: "string",
+			expression: "optional",
+			ref: "modalCancelLabel",
+			defaultValue: translator.get( "Common.Cancel" ),
+			show: function( item ) {
+				return item.action === "requestConfirmation";
+			}
+		},
+		modalOkLabel: {
+			label: "Confirm label",
+			type: "string",
+			expression: "optional",
+			ref: "modalOkLabel",
+			defaultValue: translator.get( "Common.OK" ),
+			show: function( item ) {
+				return item.action === "requestConfirmation";
 			}
 		},
 		enabled: {
