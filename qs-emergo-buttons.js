@@ -40,9 +40,6 @@ define([
 		 */
 		var fsm = new util.StateMachine({
 			on: {
-				beforeDo: function() {
-					disabled();
-				},
 				leaveIdle: function( lifecycle, button ) {
 					if (button) {
 						return emergoActions.doMany(button, $scope);
@@ -52,8 +49,6 @@ define([
 					if (button) {
 						emergoActions.doNavigation(button, $scope);
 					}
-
-					disabled(false);
 				}
 			}
 		}),
@@ -76,19 +71,6 @@ define([
 				fsm.do(button);
 			}
 		};
-
-		/**
-		 * Disable or enable button interaction
-		 *
-		 * @param {Boolean} disable Optional. Whether to disable or enable. Defaults to true.
-		 * @return {Void}
-		 */
-		function disabled( disable ) {
-			$scope.disabled = "undefined" === typeof disable || !! disable;
-		}
-
-		// Reset interaction when possibly disabled. Can be caused by previous navigation actions.
-		disabled(false);
 
 		/**
 		 * Return the set of list styles
@@ -220,7 +202,7 @@ define([
 		 * @return {Boolean}        Is the button disabled?
 		 */
 		$scope.btnDisabled = function( button ) {
-			return ! ("" === button.enabled || isNaN(parseInt(button.enabled)) || !! parseInt(button.enabled)) || $scope.disabled;
+			return ! ("" === button.enabled || isNaN(parseInt(button.enabled)) || !! parseInt(button.enabled));
 		};
 
 		/**
