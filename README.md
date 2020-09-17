@@ -84,7 +84,7 @@ Setting the button's color can be done in three ways:
 ### Actions
 Interacting with a button may trigger one or multiple sequenced actions. The list of actions contains all the current ones present in the extensions provided with the *Qlik Dashboard bundle* shipped with Qlik Sense, and some new ones as well. Note that reordering of actions is not possible due to nested ordering issues of the property panel.
 
-When providing values in an expression, be aware that the setting will first be evaluated before use in the extension. So when providing plain values, make sure to define them *without* a leading `=` or as explicit text surrounded by single quotes. This does apply to settings for field names as well.
+	IMPORTANT: When providing values in an expression, be aware that the setting will first be evaluated before it is used by the extension. So when providing plain values, either make sure to define them *without* the leading `=` or otherwise as explicit text by surrounding the value with single quotes. This does apply to settings for FIELD NAMES as well.
 
 The following actions are available:
 - **Apply Bookmark** You can pick from a list of available bookmarks in the current app.
@@ -134,6 +134,9 @@ This action sets the current Qlik Sense visual theme to the specified theme. You
 
 #### Log to Console
 This action logs the result of the provided expression to the browser's console. This functionality is provided for debugging purposes.
+
+#### Request confirmation
+This action displays a dialog modal requesting the user for confirmation. When the user selects 'OK' the next action will be started. When the user selects 'Cancel' the action chain will be stopped. Use this action to confirm user intent when buttons are clicked. Alternatively, the action can be used to display an information modal with limited layout options.
 
 ### Navigation
 After all triggered actions are successfully handled, a navigation action may kick in to move the user to a different location. The following navigation options are available:
