@@ -1,7 +1,7 @@
 ---
 Qlik Sense Visualization Extension
 Name: E-mergo Buttons
-Version: 1.2.20200731
+Version: 1.3.20200918
 QEXT: qs-emergo-buttons.qext
 ---
 
