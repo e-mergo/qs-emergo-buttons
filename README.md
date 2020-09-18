@@ -174,24 +174,28 @@ Requests for additional features can be posted in the extension's GitHub reposit
 
 ## Changelog
 
+#### 1.3.20200918 - QS Sept 2020
+- Added the _Request confirmation_ action.
+- Removed global disabled state of the button set.
+
 #### 1.2.20200731
-- Added the button's _Description_ setting
-- Added the button's _Enable button if_ setting
-- Added detection of invalid field names in actions
-- Fixed selection of stories for _Start Story_ navigation action
-- Fixed enabling/disabling of individual actions
-- Fixed use of translated labels for settings where possible
-- Fixed button layout to better match the appearance of other common Qlik Sense elements
+- Added the button's _Description_ setting.
+- Added the button's _Enable button if_ setting.
+- Added detection of invalid field names in actions.
+- Fixed selection of stories for _Start Story_ navigation action.
+- Fixed enabling/disabling of individual actions.
+- Fixed use of translated labels for settings where possible.
+- Fixed button layout to better match the appearance of other common Qlik Sense elements.
 
 #### 1.1.20200713
 - Added the _Log to Console_ action
-- Fixed selection of Dual values for the _Select Adjacent Value_ action
+- Fixed selection of Dual values for the _Select Adjacent Value_ action.
 
 #### 1.0.20200623
-- Updated docs files
+- Updated docs files.
 
-#### 1.0.20200622
-- Fixed use of deprecated contentApi service
+#### 1.0.20200622 - QS June 2020
+- Fixed use of deprecated contentApi service.
 
 #### 0.5.20191015
 - Added a safety limit setting of 100 buttons when generating the dynamic button set, to prevent unintended browser memory overload.
@@ -209,7 +213,7 @@ Requests for additional features can be posted in the extension's GitHub reposit
 
 #### 0.2.20190905
 - Added icon parsing in button labels.
-- Added action 'Start Reload Task'
+- Added action 'Start Reload Task'.
 - Fixed the position setting to use a dropdown input.
 
 #### 0.1.20190724
