@@ -1,5 +1,6 @@
 {
-	"name": "E-mergo Buttons",
+	"title": "E-mergo Buttons",
+	"name": "Buttons",
 	"type": "visualization",
 	"author": "Laurens Offereins, E-mergo",
 	"version": "1.3.20200918",

@@ -156,8 +156,8 @@
 		var $header = $("#header");
 
 		// Page title
-		if (props.name) {
-			$header.find("#page-title").text(props.name);
+		if (props.title) {
+			$header.find("#page-title").text(props.title);
 		}
 
 		// Page subtitle
