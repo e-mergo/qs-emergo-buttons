@@ -42,7 +42,9 @@ There are two ways of adding buttons to a visualization of this extension.
 2. Create a dynamic set of buttons. Do this by switching to *Dynamic* mode and entering an expression that returns a text, seperating buttons with the `|`-character.
 
 #### Dynamic buttons
-Dynamic mode offers also a way of working with dynamic per-button characteristics. By default, the dynamic expression is interpreted as button labels. In addition, you can provide additional parameters with the `~`-seperator. These parameters can then be used in the dynamic button definition by using as `$1` through `$n`, for as many parameters as you define. With dynamic parameters you can dynamically determine things like the button's color values, action parameters (for example the *Select Field Value*'s field and value parts) or navigation values (for example the *Navigate to URI* value part). Note that these values are only parsed after Qlik's engine has processed all expressions.
+Dynamic mode offers also a way of working with dynamic per-button characteristics. By default, the result of the dynamic expression is interpreted as button labels by separating buttons on the `|`-character. In addition, additional parameters can be provided with the `~`-seperator. These parameters can then be used in the dynamic button definition by using as `$1` through `$n`, for as many parameters as you define. With dynamic parameters you can dynamically determine details like the button's color values, action parameters (for example the *Select Field Value*'s field and value parts) or navigation values (for example the *Navigate to URI* value part). Note that these values are only parsed after Qlik's engine has processed all expressions.
+
+The dynamic nature of the buttons is **only** based in the main expression. Besides using the `$`-parameter references, expressions for details in other fields *cannot* be interpreted for each particular button. Instead, the expressions will result in values equal for the entire button set.
 
 ##### Example 1
     Button 1|Button 2|Button 3
@@ -50,15 +52,45 @@ Dynamic mode offers also a way of working with dynamic per-button characteristic
 The above expression generates three buttons. As no `~` was found separating button parameters, only the `$1` parameter is available. Use this parameter for the *Label* setting.
 
 ##### Example 2
-    =Concat({<Alpha={"*"}>} Distinct Alpha & If ( SubStringCount(GetFieldSelections(Alpha, ',', 26), Alpha), '~#1abe32', '~' ), '|')
+	=Concat({1} Distinct
 
-The above expression generates as many buttons as there are distinct values in the field `Alpha`. As the `~` separates button parameters, two parameters are found: `$1` containing the content of `Alpha`, while `$2` contains the conditionally calculated color code. The color code is based on whether the concatenated value is selected, by checking whether it exists in the field's active selections. Use the first parameter in the *Label* and the *Select Field Value* action's settings to enable field selection per button. Use the second parameter in the *Color* setting.
+	    // First parameter $1: button label
+	    Alpha &
+
+	    // Parameter separator
+	    '~' &
+
+	    // Second parameter $2: color expression
+	    If ( SubStringCount(GetFieldSelections(Alpha, ',', 26), Alpha), 
+	        '#1abe32', // Color for selected values
+	        If ( NOT SubStringCount('$(=Concat({<Alpha>} distinct Alpha, ','))', Alpha),
+	            '#a9a9a9', // Color for excluded values
+	            If ( GetSelectedCount(Alpha),
+	                '#ddd', // Color for alternative values
+	                '' // No color for possible values
+	            )
+	        )
+	    )
+	, '|')
+
+The above expression generates as many buttons as there are distinct values in the field `Alpha`. The resulting text for example could look like the following, generating five buttons:
+
+	A~#ddd|B~#1abe32|C~|D~|E~#a9a9a9
+
+As the `~` separates button parameters, two parameters are found: `$1` containing the content of `Alpha`, while `$2` contains the conditionally calculated color code. Following the example, this would be A, B, C, D, E for the first parameter, and the second parameter contains a color code for the first, second and fifth button (A, B, E). The color code is based on whether the concatenated value is either selected, by checking whether it exists in the field's active selections, is excluded, by checking whether it does not exist in the field's possible values, is an alternative value, by checking whether there are any selections in the field, or it is a possible value. For all possible values the no-value is chosen for color, leaving the button white with a visible border.
+
+Use the first parameter in the *Label* and the *Select Field Value* action's settings to enable field selection per button. Use the second parameter in the *Color expression* setting:
+
+- Label: $1
+- Action field selection: $1
+- Color expression: $2
 
 To furthur dissect the expression:
 - `Concat([...] Distinct Alpha [...], '|')` creates the base set of distinct values in the `Alpha` field, concatenated by the `|`-character.
-- `{<Alpha={"*"}>}` is the aggregation's set definition to make sure all values are present in the aggregation, regardless of active selections on the `Alpha` field.
-- `If ( [...], '~#1abe32' ,'~' )` is the conditional statements which defines the second button parameter based on the outcome of the condition: either a color or an empty value.
+- `{1}` is the aggregation's set definition to make sure all values are present in the aggregation, regardless of active selections on any field.
+- `If ( [...], '#1abe32', [...], '#a9a9a9', [...], '#ddd', '' )` is the conditional statements which defines the second button parameter based on the outcome of the condition: either a color or an empty value. The selected color values match Qlik Sense's native color scheme for field selections.
 - `SubStringCount(GetFieldSelections(Alpha, ',', 26), Alpha)` checks whether the iterated value of `Alpha` is selected. More specifically, it checks whether the iterated value of `Alpha` is a substring of the set of  active selections on the field `Alpha`, which can at most contain 26 distinct selected values.
+- `NOT SubStringCount('$(=Concat({<Alpha>} distinct Alpha, ','))', Alpha)` checks whether the iterated value of `Alpha` is present in the current available set of values in `Alpha`. This is executed in a dollar-expanded expression because nested aggregations are not accepted. The `NOT` prefix inverses the result of the expression, which means it checks if the value is *not* an available value and therefor excluded.
 
 ##### Safety limit
 When the returned set of buttons from the expression is too large, the extension's logic may overload the browser's memory. To prevent this, a built-in safety limit of 100 buttons is enabled. If you know what you are doing, you can disable this limit. Another way to prevent too many buttons is to make sure to return only unique field values in the expression by using `Distinct`.
