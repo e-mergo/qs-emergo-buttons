@@ -116,7 +116,7 @@ Setting the button's color can be done in three ways:
 ### Actions
 Interacting with a button may trigger one or multiple sequenced actions. The list of actions contains all the current ones present in the extensions provided with the *Qlik Dashboard bundle* shipped with Qlik Sense, and some new ones as well. Note that reordering of actions is not possible due to nested ordering issues of the property panel.
 
-	IMPORTANT: When providing values in an expression, be aware that the setting will first be evaluated before it is used by the extension. So when providing plain values, either make sure to define them *without* the leading `=` or otherwise as explicit text by surrounding the value with single quotes. This does apply to settings for FIELD NAMES as well.
+**IMPORTANT**: When providing values in an expression, be aware that the setting will first be evaluated before it is used by the extension. So when providing plain values, either make sure to define them *without* the leading `=` or otherwise as explicit text by surrounding the value with single quotes. This does apply to settings for **field names** as well.
 
 The following actions are available:
 - **Apply Bookmark** You can pick from a list of available bookmarks in the current app.
