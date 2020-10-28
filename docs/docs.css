@@ -17,13 +17,13 @@ body {
 }
 
 h1, h2, h3, h4, h5, h6 {
-	color: #60a649;
+	color: #a9d039 /*#60a649*/;
 	font-weight: 700;
 }
 
 a,
 a:visited {
-	color: #60a649;
+	color: #a9d039 /*#60a649*/;
 	text-decoration: underline;
 	font-weight: 700;
 }
@@ -93,7 +93,7 @@ a:hover {
 }
 
 #page-title {
-	margin: 25px 0px 40px;
+	margin: 0px 0px 40px;
 	font-size: 1.5em;
 	width: 100%;
 	color: #fff;
@@ -102,7 +102,11 @@ a:hover {
 #page-title ~ span {
 	display: block;
 	margin: 15px 0px 5px;
-} 
+}
+
+#extension-title {
+	font-weight: bold;
+}
 
 #navigation {
 	grid-area: nav;
@@ -153,6 +157,7 @@ a:hover {
 
 #content,
 #footer {
+	min-width: 0;
 	padding-left: 40px;
 }
 
@@ -208,7 +213,8 @@ body:not(.error-file-not-found) #content h3:before,
 	font-size: 13px;
 	background: #f4f4f4;
 	padding: 15px 20px;
-	white-space: normal;
+	white-space: pre;
+	overflow-x: auto;
 }
 
 #content :not(pre) code {

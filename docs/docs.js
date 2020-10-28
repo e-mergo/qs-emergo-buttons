@@ -13,6 +13,13 @@
 		alert("Sorry! Could not locate Qlik Sense libraries necessary for gerenating this documentation page.");
 	}
 
+	// Configure Markdown-it
+	var MD = window.markdownit({
+		html: true,
+		linkify: true,
+		typographer: true
+	});
+
 	// Use content from the `README.md` root file
 	$.get("../README.md").then( function( readme ) {
 		var content = stripMarkdownMetadata(readme),
@@ -32,9 +39,7 @@
 				setupDocDetails(metadata);
 			}
 		} else {
-			setupDocDetails({
-				name: "Extension documentation"
-			});
+			setupDocDetails();
 		}
 
 		// Setup content
@@ -155,9 +160,15 @@
 	function setupDocDetails( props ) {
 		var $header = $("#header");
 
-		// Page title
+		props = props || {};
+		props.title = props.title || props.name;
+
+		// Extension title
 		if (props.title) {
-			$header.find("#page-title").text(props.title);
+			$header.find("#extension-title").text(props.title);
+
+			// Specify document title
+			$("title").prepend(props.title + " - ");
 		}
 
 		// Page subtitle
@@ -201,11 +212,6 @@
 	 * @return {Void}
 	 */
 	function setupDocContent( content ) {
-		var MD = window.markdownit({
-			html: true,
-			linkify: true,
-			typographer: true
-		});
 
 		// Strip h1 headings
 		content = content.replace(/(\n# \s*.*)/g, "");
