@@ -1,7 +1,7 @@
 /**
  * E-mergo Utility library
  *
- * @version 20200729
+ * @version 20201028
  *
  * @package E-mergo
  *
@@ -117,6 +117,39 @@ define([
 	 */
 	copy = function( a ) {
 		return JSON.parse(JSON.stringify(a));
+	},
+
+	/**
+	 * Holds the element that assists in the copyToClipboard function
+	 *
+	 * @type {Element}
+	 */
+	_copyToClipboard = null,
+
+	/**
+	 * Copy a value to the system's clipboard
+	 *
+	 * Inspired by copyToClipboard functionality in extensions/qliktech/straight-table.
+	 *
+	 * @param  {String} value The value to copy
+	 * @return {Void}
+	 */
+	copyToClipboard = function( value ) {
+		var a = _copyToClipboard;
+
+		if (null === a) {
+			a = document.createElement( "textarea" );
+			a.style.position = "absolute";
+			a.style.left = "-9999px";
+			a.setAttribute( "readonly", "" );
+		}
+
+		a.value = value;
+		document.body.appendChild( a );
+		a.select();
+		a.setSelectionRange( 0, a.value.length );
+		document.execCommand( "copy" );
+		document.body.removeChild( a );
 	},
 
 	/**
@@ -689,6 +722,7 @@ define([
 		booleanFromExpression: booleanFromExpression,
 		camelCase: camelCase,
 		copy: copy,
+		copyToClipboard: copyToClipboard,
 		createCache: createCache,
 		hexToRgb: hexToRgb,
 		isDarkColor: isDarkColor,
