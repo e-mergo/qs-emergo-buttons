@@ -1,7 +1,7 @@
 /**
  * E-mergo Actions Utility Library
  *
- * @version 20200911
+ * @version 20210122
  * @author Laurens Offereins <https://github.com/lmoffereins>
  *
  * @param  {Object} qlik       Qlik's core API
@@ -1589,7 +1589,7 @@ define([
 	 *
 	 * @param  {Array}  items   Multiple registered actions
 	 * @param  {Object} context Action context
-	 * @return {Promise}        Actions done
+	 * @return {Promise}        Actions done. False indicates the action chain was broken.
 	 */
 	doMany = function( items, context ) {
 		return (items.actions || items).map( function( item ) {
@@ -1600,9 +1600,11 @@ define([
 				// Only continue when the previous action did not return false
 				if (false !== retval) {
 					return fn();
+				} else {
+					return false;
 				}
 			});
-		}, $q.resolve()).catch(console.error);
+		}, $q.resolve());
 	},
 
 	/**
