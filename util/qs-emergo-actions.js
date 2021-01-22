@@ -1257,16 +1257,23 @@ define([
 	},
 
 	/**
+	 * Holds the dialog of the request confirmation action
+	 *
+	 * @type {Array}
+	 */
+	requestConfirmationDialog = null,
+
+	/**
 	 * Display a confirmation dialog
 	 *
 	 * @param  {Object}  item Action
 	 * @return {Promise} Action confirmed or cancelled
 	 */
 	requestConfirmation = function( item ) {
-		var dfd = $q.defer(),
+		var dfd = $q.defer();
 
 		// Contstruct dialog
-		dialog = showActionFeedback({
+		requestConfirmationDialog = showActionFeedback({
 			title: item.modalTitle,
 			message: item.modalContent || ( item.modalTitle ? "" : "Are you sure?" ),
 			okLabel: item.modalOkLabel || translator.get( "Common.OK" ),
@@ -1276,7 +1283,12 @@ define([
 
 		// Resolve the promise on dialog close. Cancelling the modal will
 		// short-circuit the action chain.
-		dialog.closed.then(dfd.resolve);
+		requestConfirmationDialog.closed.then( function( done ) {
+			dfd.resolve(done);
+
+			// Remove the dialog
+			requestConfirmationDialog = null;
+		});
 
 		return dfd.promise;
 	},
@@ -1597,8 +1609,8 @@ define([
 		}).reduce( function( promise, fn ) {
 			return promise.then( function( retval ) {
 
-				// Only continue when the previous action did not return false
-				if (false !== retval) {
+				// Only continue when the previous action did not return false. Also no dialog should be active.
+				if (false !== retval && null === requestConfirmationDialog) {
 					return fn();
 				} else {
 					return false;
