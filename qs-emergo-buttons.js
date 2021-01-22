@@ -34,31 +34,11 @@ define([
 	 */
 	var controller = ["$scope", function( $scope ) {
 		/**
-		 * Define a single-loop state-machine for handling events
-		 *
-		 * @type {StateMachine}
-		 */
-		var fsm = new util.StateMachine({
-			on: {
-				leaveIdle: function( lifecycle, button ) {
-					if (button) {
-						return emergoActions.doMany(button, $scope);
-					}
-				},
-				afterDo: function( lifecycle, button ) {
-					if (button) {
-						emergoActions.doNavigation(button, $scope);
-					}
-				}
-			}
-		}),
-
-		/**
 		 * Cache functions for this controller
 		 *
 		 * @type {Object} Cache functions
 		 */
-		cache = util.createCache("qs-emergo-buttons/" + $scope.$id);
+		var cache = util.createCache("qs-emergo-buttons/" + $scope.$id);
 
 		/**
 		 * Button select handler
@@ -67,8 +47,14 @@ define([
 		 * @return {Void}
 		 */
 		$scope.do = function( button ) {
+
+			// Apply button actions when not editing the sheet
 			if (! $scope.object.inEditState()) {
-				fsm.do(button);
+				emergoActions.doMany(button, $scope).then( function( done ) {
+
+					// Evaluate navigation settings
+					return done && emergoActions.doNavigation(button, $scope);
+				}).catch(console.error);
 			}
 		};
 
