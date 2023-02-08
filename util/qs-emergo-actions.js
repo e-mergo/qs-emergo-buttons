@@ -204,6 +204,11 @@ define([
 		value: "applyTheme",
 		showTheme: true
 	}, {
+		label: "Call REST API",
+		value: "callRestApi",
+		showVariable: true,
+		showRestFields: true
+	}, {
 		label: "Log to Console",
 		value: "logToConsole",
 		valueLabel: "Expression",
@@ -1247,6 +1252,60 @@ define([
 	},
 
 	/**
+	 * Send a request to a REST API
+	 *
+	 * @param  {Object}  item Action
+	 * @return {Promise}      Action done
+	 */
+	callRestApi = function( item ) {
+		var dfd = $q.defer();
+
+		// Clear variable beforehand
+		if (item.variable) {
+			setVariable({
+				variable: item.variable,
+				value: ""
+			}).then(dfd.resolve);
+		} else {
+			dfd.resolve();
+		}
+
+		return dfd.promise.then( function() {
+			return request({
+				url: item.restApiLocation,
+				method: item.restApiMethod,
+				headers: item.restApiHeaders.reduce(function( obj, item ) {
+					obj[item.name] = item.value;
+					return obj;
+				}, {}),
+				data: item.restApiBody.length ? JSON.parse(item.restApiBody) : null
+			}).then( function( response ) {
+
+				// Store response in a variable
+				if (response.data && item.variable) {
+					return setVariable({
+						variable: item.variable,
+						/**
+						 * Escape single quotes by quoting twice
+						 *
+						 * @see https://community.qlik.com/t5/Design/Escape-sequences/ba-p/1469770
+						 */
+						value: JSON.stringify(response.data, null, "  ").replace("'", "''")
+					});
+				}
+			}).catch( function( error ) {
+				console.log(error);
+
+				return requestConfirmation({
+					modalTitle: "Error from ".concat(item.restApiLocation),
+					modalContent: error.response.data ? error.response.data.error.message : error.response.statusText,
+					modalCancelLabel: false
+				});
+			});
+		});
+	},
+
+	/**
 	 * Log a value to the console
 	 *
 	 * @param  {Object}  item Action
@@ -1336,6 +1395,7 @@ define([
 		applyTheme: applyTheme,
 
 		// Other
+		callRestApi: callRestApi,
 		logToConsole: logToConsole,
 		requestConfirmation: requestConfirmation
 	},
@@ -1820,6 +1880,84 @@ define([
 			},
 			show: function( item ) {
 				return showProperty(item, "showBookmark");
+			}
+		},
+		restApiLocation: {
+			label: "Location",
+			type: "string",
+			expression: "optional",
+			ref: "restApiLocation",
+			show: function( item ) {
+				return showProperty(item, "showRestFields");
+			}
+		},
+		restApiMethod: {
+			label: "Method",
+			type: "string",
+			component: "dropdown",
+			ref: "restApiMethod",
+			options: [{
+				label: "GET", value: "GET"
+			}, {
+				label: "POST", value: "POST"
+			}, {
+				label: "PUT", value: "PUT"
+			}, {
+				label: "PATCH", value: "PATCH"
+			}, {
+				label: "DELETE", value: "DELETE"
+			}],
+			defaultValue: "GET",
+			show: function( item ) {
+				return showProperty(item, "showRestFields");
+			}
+		},
+		restApiHeaders: {
+			label: "Headers",
+			addTranslation: "Add Header",
+			type: "array",
+			ref: "restApiHeaders",
+			itemTitleRef: function( item ) {
+				return item.name || "Header";
+			},
+			allowAdd: true,
+			allowRemove: true,
+			allowMove: true,
+			items: {
+				headerName: {
+					label: "Name",
+					type: "string",
+					expression: "optional",
+					ref: "name",
+					defaultValue: ""
+				},
+				headerValue: {
+					label: "Value",
+					type: "string",
+					expression: "optional",
+					ref: "value",
+					defaultValue: ""
+				}
+			},
+			show: function( item ) {
+				return showProperty(item, "showRestFields");
+			}
+		},
+		restApiBody: {
+			label: "Body",
+			type: "string",
+			expression: "optional",
+			ref: "restApiBody",
+			show: function( item ) {
+				return showProperty(item, "showRestFields");
+			}
+		},
+		restApiResponse: {
+			label: "Select a variable for storing the response of the REST call. You can use the variable to further process the response.",
+			component: "text",
+			style: "hint",
+			show: function( item ) {
+				return showProperty(item, "showRestFields");
 			}
 		},
 		variable: {
