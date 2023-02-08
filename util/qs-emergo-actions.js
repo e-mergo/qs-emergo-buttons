@@ -277,7 +277,7 @@ define([
 			if (! field.field) {
 				showActionFeedback({
 					title: "Invalid field",
-					message: "The field named '" + field.fldname + "' does not exist. Please make sure the relevant expression generates an existing field name."
+					message: "The field named '".concat(item.field, "' does not exist. Please make sure the relevant expression generates an existing field name.")
 				}).closed.then(errorCallback).then(dfd.resolve);
 			} else {
 
@@ -693,7 +693,7 @@ define([
 		timeUntill = timeUntill || new Date();
 
 		var timeDiff = (timeUntill - timeStarted) / 1000,
-		    elapsedTime = formatNum(timeDiff / 3600) + ":" + formatNum(timeDiff % 3600 / 60) + ":" + formatNum(timeDiff % 60);
+		    elapsedTime = "".concat(formatNum(timeDiff / 3600), ":", formatNum(timeDiff % 3600 / 60), ":", formatNum(timeDiff % 60));
 
 		return elapsedTime;
 	},
@@ -881,7 +881,7 @@ define([
 			var dialog = showActionFeedback({
 				title: "Reload task error",
 				message: id
-					? "The reload task with id '" + id + "' was not found."
+					? "The reload task with id '".concat(id, "' was not found.")
 					: "The settings for this action are not properly defined."
 			});
 
@@ -899,7 +899,7 @@ define([
 		taskIsRunningDialog = function( task ) {
 			var dialog = showActionFeedback({
 				title: "Reload task",
-				message: "The reload task named '" + task.name + "' is currently running."
+				message: "The reload task named '".concat(task.name, "' is currently running.")
 			});
 
 			dialog.closed.then(actionDfd.resolve);
@@ -918,7 +918,7 @@ define([
 
 			// Check the session execution
 			request({
-				url: "/qrs/executionresult?filter=executionId eq " + sessionId
+				url: "/qrs/executionresult?filter=executionId eq ".concat(sessionId)
 			}).then( function( resp ) {
 
 				// No access
@@ -1026,7 +1026,7 @@ define([
 
 						$scope.input.hideOkButton = false;
 						$scope.input.title = "Reload task executed";
-						$scope.input.message = "The reload task named '" + task.name + "' was successfully executed.";
+						$scope.input.message = "The reload task named '".concat(task.name, "' was successfully executed.");
 
 						// Close on success
 						if (item.taskAutoResolve) {
@@ -1046,7 +1046,7 @@ define([
 						clearInterval(progressInterval);
 
 						$scope.input.title = "Reload task failed";
-						$scope.input.message = "Execution of the reload task named '" + task.name + "' failed with the following message: " + message;
+						$scope.input.message = "Execution of the reload task named '".concat(task.name, "' failed with the following message: ", message);
 						$scope.input.hideOkButton = false;
 
 						// Enable script log download
@@ -1076,7 +1076,7 @@ define([
 				}],
 				template: reloadTmpl,
 				input: {
-					message: "The reload task named '" + task.name + "' was started.",
+					message: "The reload task named '".concat(task.name, "' was started."),
 					title: "Reload task started",
 					showProgress: ! item.taskDisplayProgress || "optional" === item.taskDisplayProgress,
 					hideCancelButton: true,
@@ -1103,7 +1103,7 @@ define([
 
 						// Identify the script file id
 						request({
-							url: "/qrs/reloadtask/" + task.id + "/scriptlog?fileReferenceId=" + dialog.error.fileReferenceID
+							url: "/qrs/reloadtask/".concat(task.id, "/scriptlog?fileReferenceId=", dialog.error.fileReferenceID)
 						}).then( function( resp ) {
 
 							/**
@@ -1112,7 +1112,7 @@ define([
 							 * @link https://community.qlik.com/t5/Qlik-Sense-Integration/Download-LOG-file-using-QRS-API/m-p/1567000
 							 */
 							request({
-								url: "/qrs/download/reloadtask/" + resp.data.value + "/" + task.name + ".log"
+								url: "/qrs/download/reloadtask/".concat(resp.data.value, "/", task.name, ".log")
 							}).then( function( resp ) {
 
 								// Trigger download for the script log as file
@@ -1138,7 +1138,7 @@ define([
 		taskIsNotStartedDialog = function( task, error ) {
 			var dialog = showActionFeedback({
 				title: "Reload task error",
-				message: "Something went wrong when trying to start the reload task named '" + task.name + "': " + error.data
+				message: "Something went wrong when trying to start the reload task named '".concat(task.name, "': ", error.data)
 			});
 
 			dialog.closed.then(actionDfd.resolve);
@@ -1167,7 +1167,7 @@ define([
 			} else {
 				dialog = showActionFeedback({
 					title: "Reload task",
-					message: "You are going to start the reload task named '" + task.name + "'.",
+					message: "You are going to start the reload task named '".concat(task.name, "'."),
 					okLabel: "Start task",
 					hideCancelButton: false
 				});
@@ -1196,7 +1196,7 @@ define([
 		startTask = function( task ) {
 			request({
 				method: "POST",
-				url: "/qrs/task/" + task.id + "/start/synchronous"
+				url: "/qrs/task/".concat(task.id, "/start/synchronous")
 			}).then( function openTaskIsStartedDialog( resp ) {
 				taskIsStartedDialog(task, resp.data.value);
 			}).catch( function openTaskIsNotStartedDialog( error ) {
@@ -1207,13 +1207,13 @@ define([
 		// Find the reload task. It might not be available (for the user or it was deleted)
 		if (item.task) {
 			request({
-				url: "/qrs/reloadtask/" + item.task
+				url: "/qrs/reloadtask/".concat(item.task)
 			}).then( function findTaskIsRunning( resp ) {
 				var task = resp.data;
 
 				// Find whether the task is already running
 				request({
-					url: "/qrs/executionsession?filter=reloadTask.id eq " + task.id
+					url: "/qrs/executionsession?filter=reloadTask.id eq ".concat(task.id)
 				}).then( function openConfirmReloadTaskDialog( resp ) {
 					var dialog;
 
@@ -1376,7 +1376,7 @@ define([
 
 		// Signal disabled actions
 		if (! item.enabled) {
-			title = "// " + title;
+			title = "// ".concat(title);
 		}
 
 		return title;
@@ -1511,15 +1511,16 @@ define([
 	 * @return {Void}
 	 */
 	goToAppSheet = function( item ) {
-		var config = app.global.session.options,
-		    url;
+		var config = app.global.session.options, url;
 
 		if (item.app) {
-		    url = (config.isSecure ? "https://" : "http://") + config.host
-		    	+ (config.port ? ":" + config.port : "")
-		    	+ (config.prefix ? "/" + config.prefix : "")
-		    	+ "/sense/app/" + encodeURIComponent(item.app)
-		    	+ (item.sheet ? "/sheet/" + item.sheet + "/state/analysis" : "");
+			url = (config.isSecure ? "https://" : "http://").concat(
+				config.host,
+				(config.port ? ":".concat(config.port) : ""),
+				(config.prefix ? "/".concat(config.prefix) : ""),
+				"/sense/app/".concat(encodeURIComponent(item.app)),
+				(item.sheet ? "/sheet/".concat(item.sheet, "/state/analysis") : "")
+			);
 
 			window.open(url, item.newTab ? "_blank" : "_self");
 		}
@@ -1592,7 +1593,7 @@ define([
 		return false !== item.enabled
 			? "function" === typeof actions[item.action]
 				? actions[item.action](item, context)
-				: $q.reject("E-mergo actions: '" + item.action + "' action handler not found", item)
+				: $q.reject("E-mergo actions: '".concat(item.action, "' action handler not found"), item)
 			: $q.resolve();
 	},
 
@@ -2060,7 +2061,7 @@ define([
 		},
 		threshold: {
 			label: function( item ) {
-				return "Threshold" + (item.threshold && ": " + item.threshold);
+				return "Threshold".concat(item.threshold && ": ".concat(item.threshold));
 			},
 			ref: "threshold",
 			type: "number",
