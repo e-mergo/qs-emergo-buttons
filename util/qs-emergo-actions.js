@@ -1294,11 +1294,11 @@ define([
 					});
 				}
 			}).catch( function( error ) {
-				console.log(error);
+				console.error(error);
 
 				return requestConfirmation({
 					modalTitle: "Error from ".concat(item.restApiLocation),
-					modalContent: error.response.data ? error.response.data.error.message : error.response.statusText,
+					modalContent: error.response.data ? error.response.data.error.message : (error.response.statusText || error.message),
 					modalCancelLabel: false
 				});
 			});
