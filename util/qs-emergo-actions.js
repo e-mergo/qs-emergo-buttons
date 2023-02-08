@@ -1,7 +1,7 @@
 /**
  * E-mergo Actions Utility Library
  *
- * @version 20210122
+ * @version 20230208
  * @author Laurens Offereins <https://github.com/lmoffereins>
  *
  * @param  {Object} qlik       Qlik's core API
@@ -1589,7 +1589,7 @@ define([
 	 * @return {Promise}        Action done
 	 */
 	doOne = function( item, context ) {
-		return item.enabled !== false
+		return false !== item.enabled
 			? "function" === typeof actions[item.action]
 				? actions[item.action](item, context)
 				: $q.reject("E-mergo actions: '" + item.action + "' action handler not found", item)
@@ -1599,19 +1599,27 @@ define([
 	/**
 	 * Run multiple actions sequentially
 	 *
-	 * @param  {Array}  items   Multiple registered actions
-	 * @param  {Object} context Action context
-	 * @return {Promise}        Actions done. False indicates the action chain was broken.
+	 * @param  {Array|Function} items   Multiple registered actions or callback to get actions. Provide a
+	 *                                  callback to utilize fresh updates on properties from `layout`.
+	 * @param  {Object}         context Action context
+	 * @return {Promise}                Actions done. False indicates the action chain was broken.
 	 */
 	doMany = function( items, context ) {
-		return (items.actions || items).map( function( item ) {
-			return doOne.bind(this, item, context);
-		}).reduce( function( promise, fn ) {
+		/**
+		 * Return the iterable actions
+		 *
+		 * @return {Array} Action items
+		 */
+		function getActions() {
+			return "function" === typeof items ? items().actions : (items.actions || items);
+		};
+
+		return getActions().reduce( function( promise, item, ix ) {
 			return promise.then( function( retval ) {
 
 				// Only continue when the previous action did not return false. Also no dialog should be active.
 				if (false !== retval && null === requestConfirmationDialog) {
-					return fn();
+					return doOne(getActions()[ix], context);
 				} else {
 					return false;
 				}
@@ -1622,11 +1630,14 @@ define([
 	/**
 	 * Run the navigation action
 	 *
-	 * @param  {Object} nav     Navigation settings
-	 * @param  {Object} context Navigation context
+	 * @param  {Object|Function} nav     Navigation settings or callback to get navigation settings. Provide
+	 *                                   a callback to utilize fresh updates on properties from `layout`.
+	 * @param  {Object}          context Navigation context
 	 * @return {Void}
 	 */
 	doNavigation = function( nav, context ) {
+		nav = "function" === typeof nav ? nav() : nav;
+
 		nav.navigation && (nav = nav.navigation);
 		nav.enabled && "function" === typeof navigation[nav.action] && navigation[nav.action](nav);
 	},

@@ -4,6 +4,8 @@
  * @since 20180609
  * @author Laurens Offereins <https://github.com/lmoffereins>
  *
+ * @param  {Object} underscore    JS utility library
+ * @param  {Object} qUtil         Qlik utility library
  * @param  {Object} props         Property panel definition
  * @param  {Object} initProps     Initial properties
  * @param  {Object} emergoActions E-mergo Actions API
@@ -14,6 +16,8 @@
  * @return {Object}               Extension structure
  */
 define([
+	"underscore",
+	"util",
 	"./properties",
 	"./initial-properties",
 	"./util/qs-emergo-actions",
@@ -21,7 +25,7 @@ define([
 	"./util/util",
 	"text!./style.css",
 	"text!./template.ng.html"
-], function( props, initProps, emergoActions, buttonLayout, util, css, tmpl ) {
+], function( _, qUtil, props, initProps, emergoActions, buttonLayout, util, css, tmpl ) {
 
 	// Add global styles to the page
 	util.registerStyle("qs-emergo-buttons", css);
@@ -47,13 +51,14 @@ define([
 		 * @return {Void}
 		 */
 		$scope.do = function( button ) {
+			var cb = getBtn.bind(this, button.cId);
 
 			// Apply button actions when not editing the sheet
 			if (! $scope.object.inEditState()) {
-				emergoActions.doMany(button, $scope).then( function( done ) {
+				emergoActions.doMany(cb, $scope).then( function( done ) {
 
 					// Evaluate navigation settings
-					return (false !== done) && emergoActions.doNavigation(button, $scope);
+					return (false !== done) && emergoActions.doNavigation(cb, $scope);
 				}).catch(console.error);
 			}
 		};
@@ -118,6 +123,9 @@ define([
 			dynamic.rule.split("|").slice(0, size).forEach( function( a ) {
 				var b = util.parseDynamicParams(util.copy(def), a.split("~"));
 
+				// Assign unique cId for each button
+				b.cId = qUtil.generateId();
+
 				// Default to the outline style
 				if (! b.colorExpression.length) {
 					b.styleType = "style";
@@ -130,6 +138,16 @@ define([
 			cache.set(def, buttons);
 
 			return buttons;
+		}
+
+		/**
+		 * Return the specified active button
+		 *
+		 * @param  {String} cId Button identifier
+		 * @return {Object}     Button
+		 */
+		function getBtn( cId ) {
+			return _.find($scope.btns(), { "cId": cId });
 		}
 
 		/**
