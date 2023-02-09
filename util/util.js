@@ -1,7 +1,7 @@
 /**
  * E-mergo Utility library
  *
- * @version 20201028
+ * @version 20210306
  *
  * @package E-mergo
  *
@@ -341,7 +341,7 @@ define([
 		}
 
 		// Prefix QRS calls with the proxy
-		if (0 === args.url.indexOf("/qrs") && globalProps.prefix.length) {
+		if ((args.applyPrefix || 0 === args.url.indexOf("/qrs")) && globalProps.prefix.length) {
 			args.url = globalProps.prefix.replace(/\/+$/, "") + args.url;
 		}
 
