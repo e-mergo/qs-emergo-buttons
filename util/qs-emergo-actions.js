@@ -258,6 +258,13 @@ define([
 	/**
 	 * Return the item's field
 	 *
+	 * NB. Known bug is that on app reload started in another browser tab does
+	 * not refresh the field socket handle after it is closed on app reload.
+	 * This does not occur when the reload is executed in the same browser tab.
+	 * The issue's origin is that the app's `fieldCache` is apparently not
+	 * cleared in this situation. Using the lower level `getField` method
+	 * instead does not solve the issue of the abstracted 'app.field()' Field API.
+	 *
 	 * @param  {Object} item  Action item
 	 * @param  {Object} state Context state
 	 * @param  {Function} callback Callback to run when the field was found
@@ -274,10 +281,10 @@ define([
 			};
 		}
 
-		// The Promise of field.waitFor does not get resolved nor rejected when
-		// the item.field is not a valid field name in the app. To make sure that
-		// the field can properly be evaluated, we apply a delay before evaluation
-		// to make sure that the API request must have returned any value.
+		// The Promise of field.waitFor does not get resolved or rejected when
+		// requesting an invalid field in the app. To make sure that the field
+		// can properly be evaluated, a delay is applied before evaluation so
+		// that we ensure that the API request must have returned any value.
 		setTimeout(function() {
 			if (! field.field) {
 				showActionFeedback({
@@ -356,7 +363,7 @@ define([
 		// Require a field name for a single field
 		if (item.field) {
 			return getField(item, state, function( field ) {
-				return field[item.eitherOr ? "clearOther" : "clear"]();
+				return field[item.eitherOr ? (field.hasOwnProperty("clearOther") ? "clearOther" : "clearAllButThis") : "clear"]();
 			});
 
 		// Apply to all selected fields
@@ -581,7 +588,7 @@ define([
 				 * Create a cube when the action is run instead of instantly on the item's
 				 * property data (like normal visualizations do using a hypercube). This way,
 				 * there's no constant updating of hypercube data, but only a single fetch.
-				 * The cube is immediately destroyed after it is received.
+				 * The cube's session object is immediately destroyed after it is received.
 				 */
 				app.createCube({
 					qStateName: state,
