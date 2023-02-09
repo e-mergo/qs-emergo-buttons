@@ -4,8 +4,8 @@
  * @since 20180609
  * @author Laurens Offereins <https://github.com/lmoffereins>
  *
- * @param  {Object} underscore    JS utility library
  * @param  {Object} qUtil         Qlik utility library
+ * @param  {Object} _             Underscore
  * @param  {Object} props         Property panel definition
  * @param  {Object} initProps     Initial properties
  * @param  {Object} emergoActions E-mergo Actions API
@@ -16,8 +16,8 @@
  * @return {Object}               Extension structure
  */
 define([
-	"underscore",
 	"util",
+	"underscore",
 	"./properties",
 	"./initial-properties",
 	"./util/qs-emergo-actions",
@@ -25,7 +25,7 @@ define([
 	"./util/util",
 	"text!./style.css",
 	"text!./template.ng.html"
-], function( _, qUtil, props, initProps, emergoActions, buttonLayout, util, css, tmpl ) {
+], function( qUtil, _, props, initProps, emergoActions, buttonLayout, util, css, tmpl ) {
 
 	// Add global styles to the page
 	util.registerStyle("qs-emergo-buttons", css);
