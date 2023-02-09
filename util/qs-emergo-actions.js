@@ -1,7 +1,7 @@
 /**
  * E-mergo Actions Utility Library
  *
- * @version 20230208
+ * @version 20230209
  * @author Laurens Offereins <https://github.com/lmoffereins>
  *
  * @param  {Object} qlik       Qlik's core API
@@ -1294,13 +1294,25 @@ define([
 					});
 				}
 			}).catch( function( error ) {
+				var dfd = $q.defer(), dialog;
+
+				// Log error for debugging the action
 				console.error(error);
 
-				return requestConfirmation({
-					modalTitle: "Error from ".concat(item.restApiLocation),
-					modalContent: error.response.data ? error.response.data.error.message : (error.response.statusText || error.message),
-					modalCancelLabel: false
+				// Construct dialog
+				var dialog = showActionFeedback({
+					title: "Error from ".concat(item.restApiLocation),
+					message: error.response.data ? error.response.data.error.message : (error.response.statusText || error.message),
+					hideCancelButton: true
 				});
+
+				// Resolve action on close. Confirming the modal will
+				// end the action chain because this action failed.
+				dialog.closed.then( function() {
+					dfd.resolve(false);
+				});
+
+				return dfd.promise;
 			});
 		});
 	},
@@ -1331,7 +1343,7 @@ define([
 	requestConfirmation = function( item ) {
 		var dfd = $q.defer();
 
-		// Contstruct dialog
+		// Construct dialog
 		requestConfirmationDialog = showActionFeedback({
 			title: item.modalTitle,
 			message: item.modalContent || ( item.modalTitle ? "" : "Are you sure?" ),
