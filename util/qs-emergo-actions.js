@@ -68,7 +68,7 @@ define([
 
 		// Prefix QRS calls with the proxy
 		if (0 === args.url.indexOf("/qrs") && globalProps.prefix.length) {
-			args.url = globalProps.prefix.replace(/\/+$/, "") + args.url;
+			args.url = globalProps.prefix.replace(/\/+$/, "").concat(args.url);
 		}
 
 		// Default params
@@ -475,7 +475,7 @@ define([
 					def.qDef.qSortCriterias = [{
 						qSortByExpression: parseInt(item.sortOrder) || 1,
 						qExpression: {
-							qv: (0 === item.sortExpression.indexOf("=") ? "" : "=") + item.sortExpression
+							qv: (0 === item.sortExpression.indexOf("=") ? "" : "=").concat(item.sortExpression)
 						}
 					}];
 				}
@@ -656,7 +656,7 @@ define([
 					}],
 					qMeasures: [{
 						qDef: {
-							qDef: (0 === item.value.indexOf("=") ? "" : "=") + item.value
+							qDef: (0 === item.value.indexOf("=") ? "" : "=").concat(item.value)
 						}
 					}],
 					qInitialDataFetch: [{
@@ -754,7 +754,7 @@ define([
 	 */
 	formatNum = function( num ) {
 		num = Math.floor(num);
-		return (num < 10 ? "0" : "") + num.toString();
+		return (num < 10 ? "0" : "").concat(num.toString());
 	},
 
 	/**
@@ -1191,7 +1191,7 @@ define([
 							}).then( function( resp ) {
 
 								// Trigger download for the script log as file
-								downloadTextAsFile(task.name + ".log", resp.data);
+								downloadTextAsFile(task.name.concat(".log"), resp.data);
 							});
 						});
 					}
@@ -2073,7 +2073,7 @@ define([
 					dfd.resolve(object.layout.qVariableList.qItems.map( function( b ) {
 						return {
 							value: b.qName,
-							label: 50 < b.qName.length ? b.qName.slice(0, 50) + "&hellip;" : b.qName
+							label: 50 < b.qName.length ? b.qName.slice(0, 50).concat("&hellip;") : b.qName
 						};
 					}));
 				});
