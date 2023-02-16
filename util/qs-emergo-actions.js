@@ -1,7 +1,7 @@
 /**
  * E-mergo Actions Utility Library
  *
- * @version 20230209
+ * @version 20230216
  * @author Laurens Offereins <https://github.com/lmoffereins>
  *
  * @param  {Object} qlik       Qlik's core API
@@ -314,8 +314,14 @@ define([
 	 * @param  {Object}  item Action
 	 * @return {Promise}      Action done
 	 */
-	applyBookmark = function( item ) {
-		app.bookmark.apply(item.bookmark);
+	applyBookmark = function( item, context ) {
+
+		// Bail when no selections are allowed
+		if (context.options && context.options.noSelections) {
+			return $q.resolve();
+		}
+
+		return app.bookmark.apply(item.bookmark);
 	},
 
 	/**
@@ -327,6 +333,11 @@ define([
 	 */
 	applySelection = function( item, context ) {
 		var state = getAlternateState(item, context), values = [];
+
+		// Bail when no selections are allowed
+		if (context.options && context.options.noSelections) {
+			return $q.resolve();
+		}
 
 		if (item.value) {
 
@@ -360,6 +371,11 @@ define([
 	clearSelection = function( item, context ) {
 		var state = getAlternateState(item, context);
 
+		// Bail when no selections are allowed
+		if (context.options && context.options.noSelections) {
+			return $q.resolve();
+		}
+
 		// Require a field name for a single field
 		if (item.field) {
 			return getField(item, state, function( field ) {
@@ -378,7 +394,13 @@ define([
 	 * @param  {Object}  item Action
 	 * @return {Promise}      Action done
 	 */
-	backOrForward = function( item ) {
+	backOrForward = function( item, context ) {
+
+		// Bail when no selections are allowed
+		if (context.options && context.options.noSelections) {
+			return $q.resolve();
+		}
+
 		return item.eitherOr ? app.forward() : app.back();
 	},
 
@@ -393,6 +415,11 @@ define([
 	 */
 	lockField = function( item, context ) {
 		var state = getAlternateState(item, context);
+
+		// Bail when no selections are allowed
+		if (context.options && context.options.noSelections) {
+			return $q.resolve();
+		}
 
 		// Require a field name for a single field
 		if (item.field) {
@@ -430,6 +457,11 @@ define([
 				qHeight: 10000
 			}]
 		};
+
+		// Bail when no selections are allowed
+		if (context.options && context.options.noSelections) {
+			return $q.resolve();
+		}
 
 		// Require a field name
 		if (item.field) {
@@ -508,6 +540,11 @@ define([
 	selectAll = function( item, context ) {
 		var state = getAlternateState(item, context);
 
+		// Bail when no selections are allowed
+		if (context.options && context.options.noSelections) {
+			return $q.resolve();
+		}
+
 		// Require a field name
 		if (item.field) {
 			return getField(item, state, function( field ) {
@@ -525,6 +562,11 @@ define([
 	 */
 	selectExcluded = function( item, context ) {
 		var state = getAlternateState(item, context);
+
+		// Bail when no selections are allowed
+		if (context.options && context.options.noSelections) {
+			return $q.resolve();
+		}
 
 		// Require a field name
 		if (item.field) {
@@ -544,6 +586,11 @@ define([
 	selectPossible = function( item, context ) {
 		var state = getAlternateState(item, context);
 
+		// Bail when no selections are allowed
+		if (context.options && context.options.noSelections) {
+			return $q.resolve();
+		}
+
 		// Require a field name
 		if (item.field) {
 			return getField(item, state, function( field ) {
@@ -562,6 +609,11 @@ define([
 	selectAlternative = function( item, context ) {
 		var state = getAlternateState(item, context);
 
+		// Bail when no selections are allowed
+		if (context.options && context.options.noSelections) {
+			return $q.resolve();
+		}
+
 		// Require a field name
 		if (item.field) {
 			return getField(item, state, function( field ) {
@@ -579,6 +631,11 @@ define([
 	 */
 	selectPareto = function( item, context ) {
 		var dfd = $q.defer(), added = 0, threshold, selection = [], state = getAlternateState(item, context);
+
+		// Bail when no selections are allowed
+		if (context.options && context.options.noSelections) {
+			return $q.resolve();
+		}
 
 		if (item.field && item.value) {
 
@@ -671,7 +728,13 @@ define([
 	 * @param  {Object}  item Action
 	 * @return {Promise}      Action done
 	 */
-	setVariable = function( item ) {
+	setVariable = function( item, context ) {
+
+		// Bail when no selections are allowed
+		if (context.options && context.options.noSelections) {
+			return $q.resolve();
+		}
+
 		// `setContent` is deprecated since 2.1, use `setNumValue` or `setStringValue` instead
 		return app.variable["number" === typeof item.value ? "setNumValue" : "setStringValue"](item.variable, item.value);
 	},
@@ -749,7 +812,7 @@ define([
 	 * @param  {Object}  item Action
 	 * @return {Promise}      Action done
 	 */
-	startReload = function( item ) {
+	startReload = function( item, context ) {
 		var dfd = $q.defer(),
 
 		/**
@@ -880,7 +943,7 @@ define([
 	 * @param  {Object}  item Action
 	 * @return {Promise}      Action done
 	 */
-	startReloadTask = function( item ) {
+	startReloadTask = function( item, context ) {
 		var actionDfd = $q.defer(),
 
 		/**
@@ -1254,7 +1317,7 @@ define([
 	 * @param  {Object}  item Action
 	 * @return {Promise}      Action done
 	 */
-	applyTheme = function( item ) {
+	applyTheme = function( item, context ) {
 		return qlik.theme.apply(item.theme);
 	},
 
@@ -1264,7 +1327,7 @@ define([
 	 * @param  {Object}  item Action
 	 * @return {Promise}      Action done
 	 */
-	callRestApi = function( item ) {
+	callRestApi = function( item, context ) {
 		var dfd = $q.defer();
 
 		// Clear variable beforehand
@@ -1330,8 +1393,9 @@ define([
 	 * @param  {Object}  item Action
 	 * @return {Void}
 	 */
-	logToConsole = function( item ) {
+	logToConsole = function( item, context ) {
 		console.log(item.value);
+		return $q.resolve();
 	},
 
 	/**
@@ -1347,7 +1411,7 @@ define([
 	 * @param  {Object}  item Action
 	 * @return {Promise} Action confirmed or cancelled
 	 */
-	requestConfirmation = function( item ) {
+	requestConfirmation = function( item, context ) {
 		var dfd = $q.defer();
 
 		// Construct dialog
@@ -1379,7 +1443,7 @@ define([
 	 * @param  {Object}  item Action
 	 * @return {Promise}      Action done
 	 */
-	setLanguage = function( item ) {
+	setLanguage = function( item, context ) {
 		return qlik.setLanguage(item.language);
 	},
 
@@ -1537,7 +1601,7 @@ define([
 	 * @param  {Object}  item Action
 	 * @return {Void}
 	 */
-	goToSheet = function( item ) {
+	goToSheet = function( item, context ) {
 		qlik.navigation.gotoSheet(item.sheet);
 	},
 
@@ -1589,7 +1653,7 @@ define([
 	 * @param  {Object}  item Action
 	 * @return {Void}
 	 */
-	goToAppSheet = function( item ) {
+	goToAppSheet = function( item, context ) {
 		var config = app.global.session.options, url;
 
 		if (item.app) {
@@ -1611,7 +1675,7 @@ define([
 	 * @param  {Object}  item Action
 	 * @return {Void}
 	 */
-	startStory = function( item ) {
+	startStory = function( item, context ) {
 		item.story && qlik.navigation.gotoStory(item.story);
 	},
 
@@ -1621,7 +1685,7 @@ define([
 	 * @param  {Object}  item Action
 	 * @return {Void}
 	 */
-	goToURI = function( item ) {
+	goToURI = function( item, context ) {
 		item.value && window.open(item.value, item.newTab ? "_blank" : "_self");
 	},
 
@@ -1631,7 +1695,7 @@ define([
 	 * @param  {Object}  item Action
 	 * @return {Void}
 	 */
-	switchToEdit = function( item ) {
+	switchToEdit = function( item, context ) {
 		if (qlik.navigation.isModeAllowed(qlik.navigation.EDIT)) {
 			qlik.navigation.setMode(qlik.navigation.EDIT);
 		} else {
@@ -1669,6 +1733,13 @@ define([
 	 * @return {Promise}        Action done
 	 */
 	doOne = function( item, context ) {
+		context = context || {};
+
+		// Bail when interaction is not allowed
+		if (context.options && context.options.noInteraction) {
+			return $q.resolve();
+		}
+
 		return false !== item.enabled
 			? "function" === typeof actions[item.action]
 				? actions[item.action](item, context)
@@ -1712,14 +1783,20 @@ define([
 	 *
 	 * @param  {Object|Function} nav     Navigation settings or callback to get navigation settings. Provide
 	 *                                   a callback to utilize fresh updates on properties from `layout`.
-	 * @param  {Object}          context Navigation context
+	 * @param  {Object}          context Navigation context or visualization scope
 	 * @return {Void}
 	 */
 	doNavigation = function( nav, context ) {
 		nav = "function" === typeof nav ? nav() : nav;
+		context = context || {};
+
+		// Bail when interaction is not allowed
+		if (context.options && context.options.noInteraction) {
+			return;
+		}
 
 		nav.navigation && (nav = nav.navigation);
-		nav.enabled && "function" === typeof navigation[nav.action] && navigation[nav.action](nav);
+		nav.enabled && "function" === typeof navigation[nav.action] && navigation[nav.action](nav, context);
 	},
 
 	/**
