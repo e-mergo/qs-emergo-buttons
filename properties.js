@@ -134,7 +134,6 @@ define([
 				}
 			},
 			colorExpression: {
-				// label: "Color expression",
 				type: "string",
 				expression: "optional",
 				ref: "colorExpression",
@@ -161,7 +160,7 @@ define([
 				 * @return {Void}
 				 */
 				add: function( item ) {
-					// Needed? JSON parse error when omitted.
+					// Is this needed? When not, a JSON parse error is returned.
 					item.qHyperCubeDef = {
 						qDimensions: [{
 							qDef: {}
