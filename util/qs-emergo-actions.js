@@ -1,7 +1,7 @@
 /**
  * E-mergo Actions Utility Library
  *
- * @version 20230216
+ * @version 20230217
  * @author Laurens Offereins <https://github.com/lmoffereins>
  *
  * @param  {Object} qlik       Qlik's core API
@@ -1339,7 +1339,7 @@ define([
 			setVariable({
 				variable: item.variable,
 				value: ""
-			}).then(dfd.resolve);
+			}, context).then(dfd.resolve);
 		} else {
 			dfd.resolve();
 		}
@@ -1365,7 +1365,7 @@ define([
 						 * @see https://community.qlik.com/t5/Design/Escape-sequences/ba-p/1469770
 						 */
 						value: JSON.stringify(response.data, null, "  ").replace("'", "''")
-					});
+					}, context);
 				}
 			}).catch( function( error ) {
 				var dfd = $q.defer(), dialog;
