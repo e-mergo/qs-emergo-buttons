@@ -12,6 +12,11 @@
 	overflow-x: hidden;
 }
 
+.qs-emergo-buttons.no-interaction {
+	overflow-y: hidden;
+	pointer-events: none;
+}
+
 .qs-emergo-buttons .qs-emergo-buttongroup {
 	display: inline-block;
 	vertical-align: middle;

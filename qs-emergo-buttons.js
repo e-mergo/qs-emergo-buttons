@@ -82,6 +82,11 @@ define([
 				0: "align-right"
 			};
 
+			// Indicate when interaction is not allowed
+			if ($scope.options.noInteraction) {
+				classes.push('no-interaction');
+			}
+
 			classes.push(this.layout.props.buttonLayout.orientation ? "vertical" : "horizontal");
 			classes.push("100%" === this.layout.props.buttonLayout.width ? "full-width" : "auto-width");
 			classes.push(this.layout.props.buttonLayout.noSpacing ? "spacing" : "nospacing");
