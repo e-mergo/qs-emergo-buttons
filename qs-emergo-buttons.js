@@ -125,7 +125,7 @@ define([
 			}
 
 			// Generate buttons
-			dynamic.rule.split("|").slice(0, size).forEach( function( a ) {
+			dynamic.rule.split("|").slice(0, size).filter(Boolean).forEach( function( a ) {
 				var b = util.parseDynamicParams(util.copy(def), a.split("~"));
 
 				// Assign unique cId for each button
