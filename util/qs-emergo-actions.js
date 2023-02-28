@@ -1,7 +1,7 @@
 /**
  * E-mergo Actions Utility Library
  *
- * @version 20230217
+ * @version 20230228
  * @author Laurens Offereins <https://github.com/lmoffereins>
  *
  * @param  {Object} qlik       Qlik's core API
@@ -1759,11 +1759,20 @@ define([
 			return $q.resolve();
 		}
 
-		return false !== item.enabled
-			? "function" === typeof actions[item.action]
-				? actions[item.action](item, context)
-				: $q.reject("E-mergo actions: '".concat(item.action, "' action handler not found"), item)
-			: $q.resolve();
+		var dfd = $q.defer();
+
+		if (item.enabled) {
+			if ("function" === typeof actions[item.action]) {
+				// Execute action after short timeout tick to allow for engine updates
+				setTimeout( function() { actions[item.action](item, context).then(dfd.resolve).catch(dfd.reject); }, 50);
+			} else {
+				dfd.reject({ message: "E-mergo actions: action handler '".concat(item.action, "' not found") });
+			}
+		} else {
+			dfd.resolve();
+		}
+
+		return dfd.promise;
 	},
 
 	/**
