@@ -735,8 +735,13 @@ define([
 			return $q.resolve();
 		}
 
+		// Wrap methods in `app.variable` in a promise to resolve chaining issues.
 		// `setContent` is deprecated since 2.1, use `setNumValue` or `setStringValue` instead
-		return app.variable["number" === typeof item.value ? "setNumValue" : "setStringValue"](item.variable, item.value);
+		return app.variable["number" === typeof item.value ? "setNumValue" : "setStringValue"](item.variable, item.value).catch( function() {
+			return $q.reject({ message: "Could not set the value of the variable '".concat(item.variable, "'") });
+		}).then( function() {
+			return true;
+		});
 	},
 
 	/**
