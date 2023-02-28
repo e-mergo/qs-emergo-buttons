@@ -1371,6 +1371,8 @@ define([
 						 */
 						value: JSON.stringify(response.data, null, "  ").replace("'", "''")
 					}, context);
+				} else {
+					return $q.reject({ message: "Could not retreive data from the response." });
 				}
 			}).catch( function( error ) {
 				var dfd = $q.defer(), dialog;
@@ -1381,7 +1383,7 @@ define([
 				// Construct dialog
 				var dialog = showActionFeedback({
 					title: "Error from ".concat(item.restApiLocation),
-					message: error.response.data ? error.response.data.error.message : (error.response.statusText || error.message),
+					message: error.response && error.response.data ? error.response.data.error.message : (error.response && error.response.statusText || error.message),
 					hideCancelButton: true
 				});
 
