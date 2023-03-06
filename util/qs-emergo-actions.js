@@ -1,7 +1,7 @@
 /**
  * E-mergo Actions Utility Library
  *
- * @version 20230228
+ * @version 20230306
  * @author Laurens Offereins <https://github.com/lmoffereins>
  *
  * @param  {Object} qlik       Qlik's core API
@@ -36,13 +36,6 @@ define([
 	var app = qlik.currApp(),
 
 	/**
-	 * Holds the reference to Qlik's global API
-	 *
-	 * @type {Object}
-	 */
-	qGlobal = qlik.getGlobal(),
-
-	/**
 	 * Holds the currently authenticated user
 	 *
 	 * @type {String}
@@ -56,7 +49,7 @@ define([
 	 * @return {Promise}            Request response
 	 */
 	request = function( args ) {
-		var globalProps = qGlobal.session.options;
+		var globalProps = app.global.session.options;
 
 		// When provided just the url
 		if ("string" === typeof args) {
@@ -2412,7 +2405,7 @@ define([
 	/**
 	 * Holds the loaded apps
 	 *
-	 * This is loaded once when calling `qGlobal.getAppList()` to
+	 * This is loaded once when calling `app.global.getAppList()` to
 	 * prevent max listener errors on the related event emitter.
 	 *
 	 * @type {Array}
@@ -2459,7 +2452,7 @@ define([
 				var dfd = $q.defer();
 
 				if ("undefined" === typeof appList) {
-					qGlobal.getAppList( function( items ) {
+					app.global.getAppList( function( items ) {
 						appList = items.map( function( a ) {
 							return {
 								label: a.qTitle,
