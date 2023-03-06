@@ -1,7 +1,7 @@
 /**
  * E-mergo Utility library
  *
- * @version 20210306
+ * @version 20230306
  *
  * @package E-mergo
  *
@@ -333,7 +333,7 @@ define([
 	 * @return {Promise} Request response
 	 */
 	qlikRequest = function( args ) {
-		var globalProps = qlik.getGlobal().session.options;
+		var globalProps = app.global.session.options;
 
 		// When provided just the url
 		if ("string" === typeof args) {
