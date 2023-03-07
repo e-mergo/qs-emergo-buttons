@@ -357,6 +357,9 @@ define([
 						ref: "navigation",
 						items: emergoActions.navigationDefinition
 					}
+				},
+				show: function( layout, context ) {
+					return layout.props.buttonSet.dynamic;
 				}
 			}
 		}
