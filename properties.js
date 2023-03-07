@@ -202,7 +202,7 @@ define([
 		 * @param {Object} layout Extension settings layout
 		 */
 		add: function( item, layout ) {
-			item.label = "Button " + (layout.props.buttons.length + 1);
+			item.label = "Button ".concat(layout.props.buttons.length + 1);
 		}
 	},
 
@@ -255,7 +255,7 @@ define([
 				component: "text",
 				style: "hint",
 				label: function( layout, context ) {
-					return "The entered dynamic expression results in " + getButtonCount(context.layout) + " buttons. To prevent unintended browser memory overload, a safety limit of 100 buttons is enabled. You can disable this safety limit if you know what your are doing. See the documentation for additional help.";
+					return "The entered dynamic expression results in ".concat(getButtonCount(context.layout), " buttons. To prevent unintended browser memory overload, a safety limit of 100 buttons is enabled. You can disable this safety limit if you know what your are doing. See the documentation for additional help.");
 				},
 				show: function( layout, context ) {
 					return layout.props.buttonSet.dynamic && getButtonCount(context.layout) > BUTTON_LIMIT;
@@ -417,7 +417,7 @@ define([
 	 */
 	about = {
 		label: function() {
-			return "About " + JSON.parse(qext).title;
+			return "About ".concat(JSON.parse(qext).title);
 		},
 		type: "items",
 		items: {
@@ -427,7 +427,7 @@ define([
 			},
 			version: {
 				label: function() {
-					return "Version: " + JSON.parse(qext).version;
+					return "Version: ".concat(JSON.parse(qext).version);
 				},
 				component: "text"
 			},
