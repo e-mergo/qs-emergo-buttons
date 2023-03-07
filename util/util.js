@@ -1,7 +1,7 @@
 /**
  * E-mergo Utility library
  *
- * @version 20230306
+ * @version 20230307
  *
  * @package E-mergo
  *
@@ -103,7 +103,7 @@ define([
 
 		// Append remaining Casing parts
 		for (i = 1; i < parts.length; i++) {
-			camelCased = camelCased + parts[i].charAt(0).toUpperCase() + parts[i].substr(1).toLowerCase();
+			camelCased = camelCased.concat(parts[i].charAt(0).toUpperCase(), parts[i].substr(1).toLowerCase());
 		}
 
 		return camelCased;
@@ -241,7 +241,7 @@ define([
 		var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
 
 		hex = "string" === typeof hex && hex.replace(shorthandRegex, function(m, r, g, b) {
-			return r + r + g + g + b + b;
+			return "".concat(r, r, g, g, b, b);
 		});
 
 		var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -290,8 +290,8 @@ define([
 
 		// Create params map
 		for (i in params) {
-			paramsMap["$" + (1 + parseInt(i))] = params[i];
-			re.push("\\$" + (1 + parseInt(i)));
+			paramsMap["$".concat(1 + parseInt(i))] = params[i];
+			re.push("\\$".concat(1 + parseInt(i)));
 		}
 
 		// Define regex elements
@@ -342,7 +342,7 @@ define([
 
 		// Prefix QRS calls with the proxy
 		if ((args.applyPrefix || 0 === args.url.indexOf("/qrs")) && globalProps.prefix.length) {
-			args.url = globalProps.prefix.replace(/\/+$/, "") + args.url;
+			args.url = globalProps.prefix.replace(/\/+$/, "").concat(args.url);
 		}
 
 		// Default params
@@ -363,8 +363,8 @@ define([
 	 * @return {Function} Deregister method
 	 */
 	registerStyle = function( name, css ) {
-		var id = name + "-style",
-		    $style = $("#" + id);
+		var id = name.concat("-style"),
+		    $style = $("#".concat(id));
 
 		// Replace style when it already exists
 		if ($style.length) {
@@ -376,7 +376,7 @@ define([
 		}
 
 		return function() {
-			$("#" + id).remove();
+			$("#".concat(id)).remove();
 		};
 	},
 
@@ -389,14 +389,14 @@ define([
 	 */
 	registerObjStyle = function( tid, config ) {
 		var css = [],
-		    name = "object-" + tid,
+		    name = "object-".concat(tid),
 		    deregisterer = function() {};
 
 		config = config || {};
 
 		// Hide object navigation
 		if (config.hideNav) {
-			css.push('.cell[tid="' + tid + '"] .qv-object-nav { display: none; }');
+			css.push('.cell[tid="'.concat(tid, '"] .qv-object-nav { display: none; }'));
 		}
 
 		// Additional css (as string)
@@ -575,7 +575,7 @@ define([
 
 			// Log transitions
 			if (options.enableLogging) {
-				console.log("StateMachine" + (options.name ? "/" + options.name : "") + "/" + hook, args);
+				console.log("StateMachine".concat(options.name ? "/".concat(options.name) : "", "/", hook), args);
 			}
 
 			// Bail when no listeners are subscribed
@@ -714,7 +714,7 @@ define([
 	 */
 	camelCase.prepended = function( prefix, s ) {
 		s = camelCase(s);
-		return prefix + s[0].toUpperCase() + s.substr(1);
+		return "".concat(prefix, s[0].toUpperCase(), s.substr(1));
 	};
 
 	return {
