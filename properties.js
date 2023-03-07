@@ -1,8 +1,7 @@
 /**
  * E-mergo Buttons Property Panel definition
  *
- * @param  {Object} qvangular     Qlik's angular implementation
- * @param  {Object} $q            Angular's promise library
+ * @param  {Object} qlik          Qlik's core API
  * @param  {Object} _             Underscore library
  * @param  {Object} util          E-mergo utility functions
  * @param  {Object} emergoActions E-mergo Actions API
@@ -10,20 +9,25 @@
  * @return {Object}               Extension Property Panel definition
  */
 define([
-	"qvangular",
-	"ng!$q",
+	"qlik",
 	"underscore",
 	"./util/util",
 	"./util/qs-emergo-actions",
 	"text!./qs-emergo-buttons.qext"
-], function( qvangular, $q, _, util, emergoActions, qext ) {
+], function( qlik, _, util, emergoActions, qext ) {
+	/**
+	 * Holds the reference to the current app's API
+	 *
+	 * @type {Object}
+	 */
+	var app = qlik.currApp(),
 
 	/**
 	 * Holds the limit for the amount of buttons to generate
 	 *
 	 * @type {Number}
 	 */
-	var BUTTON_LIMIT = 100,
+	BUTTON_LIMIT = 100,
 
 	/**
 	 * Return the count of buttons
@@ -34,6 +38,13 @@ define([
 	getButtonCount = function( layout ) {
 		return layout.props.buttonSet.dynamic ? layout.props.buttonSet.rule.split("|").length : layout.props.buttons.length;
 	},
+
+	/**
+	 * Holds the app's current theme data
+	 *
+	 * @type {Object}
+	 */
+	currTheme,
 
 	/**
 	 * Holds the settings definition of the buttons sub-panel
@@ -129,6 +140,12 @@ define([
 				component: "color-picker",
 				ref: "color",
 				dualOutput: true,
+				defaultValue: function() {
+					return {
+						index: -1,
+						color: currTheme && currTheme.properties.dataColors ? currTheme.properties.dataColors.primaryColor : "#000000"
+					};
+				},
 				show: function( button ) {
 					return "color" === button.styleType;
 				}
@@ -428,6 +445,19 @@ define([
 			}
 		}
 	};
+
+	// Find the appprops object and subscribe to layout changes
+	// This listener remains running in memory without end, but it is only
+	// created once for all instances of this extension.
+	app.getObject("AppPropsList").then( function( obj ) {
+		obj.layoutSubscribe( function() {
+
+			// Set the current theme
+			app.theme.getApplied().then( function( theme ) {
+				currTheme = theme;
+			});
+		});
+	});
 
 	return {
 		type: "items",

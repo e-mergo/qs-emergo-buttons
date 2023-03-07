@@ -166,9 +166,9 @@ define([
 
 			// Style class
 			if (-1 !== ["color", "colorExpression"].indexOf(button.styleType)) {
-				var color = "color" === button.styleType ? button.color && button.color.color : button[button.styleType];
+				var color = "color" === button.styleType ? (button.color ? button.color.color : "#000000") : button[button.styleType];
 				classes.push(util.isDarkColor(color) ? "lui-button--custom-inverse" : "lui-button--custom");
-			} else {
+			} else if (button.style) {
 				classes.push(button.style);
 			}
 
@@ -186,7 +186,7 @@ define([
 
 			// Color
 			if ("color" === button.styleType) {
-				style["background-color"] = button.color ? button.color.color : "rgba(0,0,0,0)";
+				style["background-color"] = button.color ? button.color.color : "#000000";
 			} else if ("colorExpression" === button.styleType) {
 				style["background-color"] = button.colorExpression;
 			}
@@ -251,7 +251,6 @@ define([
 		controller: controller,
 		mounted: emergoActions.mount,
 		beforeDestroy: emergoActions.destroy,
-
 		support: {
 			snapshot: false,
 			export: false,
