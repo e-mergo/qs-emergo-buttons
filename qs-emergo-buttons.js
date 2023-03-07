@@ -56,7 +56,7 @@ define([
 		if (picker && picker.color) {
 			if (-1 !== picker.index) {
 				var paletteColor = _.get(currTheme || {}, "properties.palettes.ui.0.colors".split("."), []);
-				return picker.index < paletteColor.length ? paletteColor[picker.index] : picker.color;
+				return picker.index - 1 < paletteColor.length ? paletteColor[picker.index - 1] : picker.color;
 			} else {
 				return picker.color;
 			}
