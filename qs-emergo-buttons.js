@@ -4,6 +4,7 @@
  * @since 20180609
  * @author Laurens Offereins <https://github.com/lmoffereins>
  *
+ * @param  {Object} qlik          Qlik's core API
  * @param  {Object} qUtil         Qlik utility library
  * @param  {Object} _             Underscore
  * @param  {Object} props         Property panel definition
@@ -16,6 +17,7 @@
  * @return {Object}               Extension structure
  */
 define([
+	"qlik",
 	"util",
 	"underscore",
 	"./properties",
@@ -25,10 +27,43 @@ define([
 	"./util/util",
 	"text!./style.css",
 	"text!./template.ng.html"
-], function( qUtil, _, props, initProps, emergoActions, buttonLayout, util, css, tmpl ) {
+], function( qlik, qUtil, _, props, initProps, emergoActions, buttonLayout, util, css, tmpl ) {
 
 	// Add global styles to the page
 	util.registerStyle("qs-emergo-buttons", css);
+
+	/**
+	 * Holds the reference to the current app's API
+	 *
+	 * @type {Object}
+	 */
+	var app = qlik.currApp(),
+
+	/**
+	 * Holds the app's current theme data
+	 *
+	 * @type {Object}
+	 */
+	currTheme,
+
+	/**
+	 * Return the color picker's corresponding palette color
+	 *
+	 * @param  {Object} picker Color picker value
+	 * @return {String}        Color value
+	 */
+	getPaletteColor = function( picker ) {
+		if (picker && picker.color) {
+			if (-1 !== picker.index) {
+				var paletteColor = _.get(currTheme || {}, "properties.palettes.ui.0.colors".split("."), []);
+				return picker.index < paletteColor.length ? paletteColor[picker.index] : picker.color;
+			} else {
+				return picker.color;
+			}
+		} else {
+			return "#000000";
+		}
+	},
 
 	/**
 	 * Extension controller function
@@ -36,7 +71,7 @@ define([
 	 * @param  {Object} $scope Extension scope
 	 * @return {Void}
 	 */
-	var controller = ["$scope", function( $scope ) {
+	controller = ["$scope", function( $scope ) {
 		/**
 		 * Cache functions for this controller
 		 *
@@ -166,7 +201,7 @@ define([
 
 			// Style class
 			if (-1 !== ["color", "colorExpression"].indexOf(button.styleType)) {
-				var color = "color" === button.styleType ? (button.color ? button.color.color : "#000000") : button[button.styleType];
+				var color = "color" === button.styleType ? getPaletteColor(button.color) : button[button.styleType];
 				classes.push(util.isDarkColor(color) ? "lui-button--custom-inverse" : "lui-button--custom");
 			} else if (button.style) {
 				classes.push(button.style);
@@ -186,7 +221,7 @@ define([
 
 			// Color
 			if ("color" === button.styleType) {
-				style["background-color"] = button.color ? button.color.color : "#000000";
+				style["background-color"] = getPaletteColor(button.color);
 			} else if ("colorExpression" === button.styleType) {
 				style["background-color"] = button.colorExpression;
 			}
@@ -237,6 +272,19 @@ define([
 			cache.clear();
 		});
 	}];
+
+	// Find the appprops object and subscribe to layout changes
+	// This listener remains running in memory without end, but it is only
+	// created once for all instances of this extension.
+	app.getObject("AppPropsList").then( function( obj ) {
+		obj.layoutSubscribe( function() {
+
+			// Set the current theme
+			app.theme.getApplied().then( function( theme ) {
+				currTheme = theme;
+			});
+		});
+	});
 
 	// Apply property panel patches for button layout
 	buttonLayout.applyDefinition(props);
