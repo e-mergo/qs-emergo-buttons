@@ -15,12 +15,20 @@ define([
 	"./util/qs-emergo-actions",
 	"text!./qs-emergo-buttons.qext"
 ], function( qlik, _, util, emergoActions, qext ) {
+
+	/**
+	 * Holds the QEXT data
+	 *
+	 * @type {Object}
+	 */
+	var qext = JSON.parse(qext),
+
 	/**
 	 * Holds the reference to the current app's API
 	 *
 	 * @type {Object}
 	 */
-	var app = qlik.currApp(),
+	app = qlik.currApp(),
 
 	/**
 	 * Holds the limit for the amount of buttons to generate
@@ -417,7 +425,7 @@ define([
 	 */
 	about = {
 		label: function() {
-			return "About ".concat(JSON.parse(qext).title);
+			return "About ".concat(qext.title);
 		},
 		type: "items",
 		items: {
@@ -427,7 +435,7 @@ define([
 			},
 			version: {
 				label: function() {
-					return "Version: ".concat(JSON.parse(qext).version);
+					return "Version: ".concat(qext.version);
 				},
 				component: "text"
 			},
