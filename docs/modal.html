@@ -1,0 +1,42 @@
+<lui-dialog class="qv-confirm-dialog qs-emergo-modal" style="width:calc(100% - 24px);height:93%;max-width:1280px;">
+	<lui-dialog-header>
+		<lui-dialog-title>{{input.title}}</lui-dialog-title>
+		<button type="button" qva-activate="close()" class="qs-emergo-modal-close lui-icon lui-icon--close" q-title-translation="Common.Close"></button>
+	</lui-dialog-header>
+	<lui-dialog-body id="qs-emergo-extension-documentation" class="modal-content readme-loaded">
+		<div class="container">
+			<header id="header">
+				<hgroup>
+					<h1 id="page-title">Extension documentation</h1>
+					<span id="extension-title">{{extensionTitle}}</span>
+					<span ng-repeat="detail in docDetails" class="{{detail.className}}" title="{{detail.title}}" ng-bind-html="detail.html"></span>
+				</hgroup>
+
+				<nav id="navigation">
+					<ul class="toc">
+						<li ng-repeat="li in toc" class="level-{{li.level}}">
+							<button type="button" class="button-link" title="Navigate to `{{li.text}}`" qva-activate="scrollTo($index + 1)"><span>{{li.text}}</span></button>
+						</li>
+					</ul>
+				</nav>
+			</header>
+
+			<main id="content" ng-bind-html="input.content"></main>
+
+			<footer id="footer">
+				<div class="footer-wrapper">
+					<nav id="footer-nav">
+						<span class="logo">
+							<a class="emergo-brand" title="Visit E-mergo website" href="https://www.e-mergo.nl/e-mergo-tools-bundle/?utm_medium=download&utm_source=tools_bundle&utm_campaign=E-mergo_Extension&utm_term=toolsbundle&utm_content=sitelink" target="_blank"><img class="emergo-logo" alt="E-mergo" ng-src="{{input.homeUrl}}/logo-emergo.png" /></a>
+						</span>
+						<span class="social">Connect with E-mergo on <a href="https://twitter.com/Emergo_qlikview">Twitter</a> or <a href="https://nl.linkedin.com/company/e-mergo">LinkedIn</a></span>
+					</nav>
+
+					<div id="footer-content">
+						<p>E-mergo is the leading data specialist. Working from the motto ‘Manage your data, innovate your business’ we help you to get maximum value from your data. We do this using software from Qlik, Mendix, Microsoft and TimeXtender, for which we provide software, consultancy and support. Together we will help your company to create new business models and to reduce costs.</p>
+					</div>
+				</div>
+			</footer>
+		</div>
+	</lui-dialog-body>
+</lui-dialog>

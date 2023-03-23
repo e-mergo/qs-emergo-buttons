@@ -1,10 +1,11 @@
-* {
+#qs-emergo-extension-documentation,
+#qs-emergo-extension-documentation * {
 	margin: 0px;
 	padding: 0px;
 	box-sizing: border-box;
 }
 
-body {
+#qs-emergo-extension-documentation {
 	font-family: Dosis, sans-serif;
 	font-size: 15px;
 	line-height: 1.4em;
@@ -16,23 +17,29 @@ body {
 	background-repeat: no-repeat;
 }
 
-h1, h2, h3, h4, h5, h6 {
+#qs-emergo-extension-documentation h1,
+#qs-emergo-extension-documentation h2,
+#qs-emergo-extension-documentation h3,
+#qs-emergo-extension-documentation h4,
+#qs-emergo-extension-documentation h5,
+#qs-emergo-extension-documentation h6 {
 	color: #a9d039 /*#60a649*/;
 	font-weight: 700;
+	font-size: revert;
 }
 
-a,
-a:visited {
+#qs-emergo-extension-documentation a,
+#qs-emergo-extension-documentation a:visited {
 	color: #a9d039 /*#60a649*/;
 	text-decoration: underline;
 	font-weight: 700;
 }
 
-a:hover {
+#qs-emergo-extension-documentation a:hover {
 	text-decoration: underline;
 }
 
-.container {
+#qs-emergo-extension-documentation .container {
 	width: 100%;
 	max-width: 968px;
 	min-height: 100vh;
@@ -48,7 +55,7 @@ a:hover {
 	background:#fff;
 }
 
-#header {
+#qs-emergo-extension-documentation #header {
 	position: fixed;
 	width: 260px;
 	height: 100%;
@@ -65,50 +72,72 @@ a:hover {
 	border-right: 1px solid #f5f5f5;
 }
 
-#header hgroup {
+#qs-emergo-extension-documentation.modal-content #header {
+	height: calc(93% - 86px);
+}
+
+#qs-emergo-extension-documentation #header hgroup {
 	grid-area: header;
 	padding: 30px 15px 15px;
 }
 
-#header a,
-#header a:visited {
+#qs-emergo-extension-documentation #header .button-link,
+#qs-emergo-extension-documentation #header a,
+#qs-emergo-extension-documentation #header a:visited {
+	background: none;
 	color: #fff;
 	text-decoration: none;
+	font-family: Dosis, sans-serif;
+	font-size: 15px;
 	font-weight: normal;
+	border: none;
+	cursor: pointer;
 }
 
-#header a:hover {
+#qs-emergo-extension-documentation #header .button-link {
+	padding: 0px 0px 1px 4px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+#qs-emergo-extension-documentation #header .button-link:hover,
+#qs-emergo-extension-documentation #header a:hover {
 	text-decoration: underline;
 }
 
-#header .emergo-brand {
+#qs-emergo-extension-documentation #header .button-link span {
+	text-overflow: ellipsis;
+}
+
+#qs-emergo-extension-documentation #header .emergo-brand {
 	display: inline-block;
 	display: none;
 	width: 100%;
 	text-align: center;
 }
 
-#header .emergo-brand .emergo-logo {
+#qs-emergo-extension-documentation #header .emergo-brand .emergo-logo {
 	width: 120px;
 }
 
-#page-title {
+#qs-emergo-extension-documentation #page-title {
 	margin: 0px 0px 40px;
 	font-size: 1.5em;
 	width: 100%;
 	color: #fff;
 }
 
-#page-title ~ span {
+#qs-emergo-extension-documentation #page-title ~ span {
 	display: block;
 	margin: 15px 0px 5px;
 }
 
-#extension-title {
+#qs-emergo-extension-documentation #extension-title {
 	font-weight: bold;
 }
 
-#navigation {
+#qs-emergo-extension-documentation #navigation {
 	grid-area: nav;
 	padding: 0px 15px 15px;
 	overflow-x: hidden;
@@ -116,99 +145,107 @@ a:hover {
 	counter-reset: h2;
 }
 
-#navigation ul {
+#qs-emergo-extension-documentation #navigation ul {
 	margin: 0px;
 	padding: 0px;
 	list-style: none;
 }
 
-#navigation li {
+#qs-emergo-extension-documentation.modal-content #navigation li {
+	display: flex;
+}
+
+#qs-emergo-extension-documentation #navigation li {
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	margin: 6px 0px;
 }
 
-#navigation li.level-2 {
+#qs-emergo-extension-documentation #navigation li.level-2 {
 	margin-top: 12px;
 }
 
-#navigation li.level-3 {
+#qs-emergo-extension-documentation #navigation li.level-3 {
 	margin-left: 8px;
 }
 
-#navigation li.level-4 {
+#qs-emergo-extension-documentation #navigation li.level-4 {
 	margin-left: 16px;
 }
 
-#navigation li.level-5 {
+#qs-emergo-extension-documentation #navigation li.level-5 {
 	margin-left: 24px;
 }
 
-#navigation li.level-6 {
+#qs-emergo-extension-documentation #navigation li.level-6 {
 	margin-left: 32px;
 }
 
-#content {
+#qs-emergo-extension-documentation #content {
 	grid-area: main;
 	counter-reset: h2;
 	padding: 15px;
 }
 
-#content,
-#footer {
+#qs-emergo-extension-documentation #content,
+#qs-emergo-extension-documentation #footer {
 	min-width: 0;
 	padding-left: 40px;
 }
 
-#content h2 {
+#qs-emergo-extension-documentation #no-csp {
+	display: none;
+}
+
+#qs-emergo-extension-documentation #content h2 {
 	margin: 30px 0px 12px;
 }
 
-#content h3,
-#content p,
-#content pre {
+#qs-emergo-extension-documentation #content h3,
+#qs-emergo-extension-documentation #content p,
+#qs-emergo-extension-documentation #content pre {
 	margin: 15px 0px 8px;
 }
 
-#content h4,
-#content h5,
-#content h6 {
+#qs-emergo-extension-documentation #content h4,
+#qs-emergo-extension-documentation #content h5,
+#qs-emergo-extension-documentation #content h6 {
 	margin: 15px 0px 8px 12px;
 }
 
-#content ul,
-#content ol {
+#qs-emergo-extension-documentation #content ul,
+#qs-emergo-extension-documentation #content ol {
 	margin: 8px 0px;
 	padding: 0px 0px 0px 30px;
 }
 
-#content li {
+#qs-emergo-extension-documentation #content li {
 	margin-bottom: 5px;
 }
 
-#content h2,
-#navigation li.level-2 {
+#qs-emergo-extension-documentation #content h2,
+#qs-emergo-extension-documentation #navigation li.level-2 {
 	counter-increment: h2;
 	counter-reset: h3;
 }
 
-#content h3,
-#navigation li.level-3 {
+#qs-emergo-extension-documentation #content h3,
+#qs-emergo-extension-documentation #navigation li.level-3 {
 	counter-increment: h3;
 }
 
-body:not(.error-file-not-found) #content h2:before,
-#navigation li.level-2:before {
+#qs-emergo-extension-documentation.readme-loaded #content h2:before,
+#qs-emergo-extension-documentation #navigation li.level-2:before {
 	content: counter(h2) ". ";
 }
 
-body:not(.error-file-not-found) #content h3:before,
-#navigation li.level-3:before {
+#qs-emergo-extension-documentation.readme-loaded #content h3:before,
+#qs-emergo-extension-documentation #navigation li.level-3:before {
 	content: counter(h2) "." counter(h3) ". ";
 }
 
-#content pre {
+#qs-emergo-extension-documentation #content pre {
 	font-family: monospace;
 	font-size: 13px;
 	background: #f4f4f4;
@@ -217,7 +254,7 @@ body:not(.error-file-not-found) #content h3:before,
 	overflow-x: auto;
 }
 
-#content :not(pre) code {
+#qs-emergo-extension-documentation #content :not(pre) code {
 	padding: 10px;
 	font-family: monospace;
 	font-size: 13px;
@@ -226,12 +263,15 @@ body:not(.error-file-not-found) #content h3:before,
 	padding: 0px 2px;
 }
 
-#footer {
+#qs-emergo-extension-documentation #footer {
 	grid-area: footer;
+	display: flex;
+	flex-direction: column;
+	justify-content: end;
 	padding: 0px 15px 15px;
 }
 
-#footer-nav {
+#qs-emergo-extension-documentation #footer-nav {
 	border-top: 1px solid #125c69;
 	display: -ms-grid;
 	display: grid;
@@ -242,20 +282,20 @@ body:not(.error-file-not-found) #content h3:before,
 	padding: 25px 0px 15px;
 }
 
-#footer-nav .logo {
+#qs-emergo-extension-documentation #footer-nav .logo {
 	grid-area: footer-left;
 }
 
-#footer-nav .logo .emergo-logo {
+#qs-emergo-extension-documentation #footer-nav .logo .emergo-logo {
 	width: 80px;
 }
 
-#footer-nav .social {
+#qs-emergo-extension-documentation #footer-nav .social {
 	grid-area: footer-right;
 	text-align: right;
 }
 
-#footer-content {
+#qs-emergo-extension-documentation #footer-content {
 	font-style: italic;
 	padding-bottom: 10px;
 }

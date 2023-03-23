@@ -1,97 +1,111 @@
 /**
- * E-mergo QS Extension Documentation script
+ * E-mergo QS Extension documentation script
  *
  * @since 20190802
  * @author Laurens Offereins <https://www.github.com/lmoffereins>
  *
- * @version 20200623
+ * @version 20230717
  */
-(function( window, $, _ ) {
+(function( window, $, _, factory ) {
 
-	// Bail when no libraries were found
-	if (! $ || ! window.markdownit) {
-		alert("Sorry! Could not locate Qlik Sense libraries necessary for gerenating this documentation page.");
+	// When dependencies are not globally defined
+	if ("function" !== typeof $ || "function" !== typeof window.markdownit) {
+
+		// When using modules
+		if ("function" === typeof define && define.amd) {
+			define(["./lib/markdown-it", "jquery", "underscore", "qvangular", "text!./docs.css", "text!./modal.html"], factory);
+		} else {
+			alert("Sorry! Could not locate Qlik Sense libraries necessary for generating this documentation page.");
+		}
+
+	// When used directly and libraries are found
+	} else {
+		var docs = factory(window.markdownit, $, _),
+		    $doc = $("#qs-emergo-extension-documentation");
+
+		// Use content from the `README.md` root file
+		$.get("../README.md").then( function( readme ) {
+			docs.setupDoc($doc, readme);
+		}).catch( function() {
+
+			// Tag body with error class
+			$doc.addClass("error-file-not-found");
+
+			// Setup content with error mention
+			docs.setupDocContent($doc, "## Oops, something went wrong\nThe file containing the extension's documentation named `README.md` could not be loaded.\n\nPlease try to open the extension's documentation once with a RootAdmin account or else either visit the [README file](./../README.md) directly or refer to the documentation in the original extension repository or go to [www.e-mergo.nl](https://www.e-mergo.nl/e-mergo-tools-bundle/?utm_medium=download&utm_source=tools_bundle&utm_campaign=E-mergo_Extension&utm_term=toolsbundle&utm_content=sitelink) for more information.");
+		});
 	}
+}(this, jQuery, _, (function( markdownit, $, _, qvangular, css, modalTmpl ) {
 
-	// Configure Markdown-it
-	var MD = window.markdownit({
+	/**
+	 * Holds configured Markdown-it instance
+	 *
+	 * @type {Object}
+	 */
+	var MD = markdownit({
 		html: true,
 		linkify: true,
 		typographer: true
-	});
+	}),
 
-	// Use content from the `README.md` root file
-	$.get("../README.md").then( function( readme ) {
-		var content = stripMarkdownMetadata(readme),
-		    metadata = parseMarkdownMetadata(readme);
+	/**
+	 * Add global styles to the page, replacing when it already exists
+	 *
+	 * @param  {String} name Style name/identifier
+	 * @param  {String} css  Style content
+	 * @return {Function} Deregister method
+	 */
+	registerStyle = function( name, css ) {
+		var id = name.concat("-style"),
+		    $style = $("#".concat(id));
 
-		// Readme contains metadata
-		if (_.keys(metadata).length) {
+		// Replace style when it already exists
+		if ($style.length) {
+			$style.html(css);
 
-			// File-based metadata reference
-			if (metadata.qext) {
-				$.get("../" + metadata.qext).then( function( qext ) {
-					setupDocDetails(qext);
-				}).catch( function() {
-					setupDocDetails(metadata);
-				});
-			} else {
-				setupDocDetails(metadata);
-			}
+		// Add style
 		} else {
-			setupDocDetails();
+			$("<style>").attr("id", id).html(css).appendTo("head");
 		}
 
-		// Setup content
-		setupDocContent(content);
-
-		// Setup navigation
-		setupDocToc(content);
-
-		// Tag body with success class
-		$("body").addClass("readme-loaded");
-
-	}).catch( function() {
-
-		// Tag body with error class
-		$("body").addClass("error-file-not-found");
-
-		// Setup content
-		setupDocContent("## Oops, something went wrong\nThe file containing the extension's documentation named `README.md` could not be loaded.\n\nPlease try to open the extension's documentation once with a RootAdmin account or choose one of the following:\n\n- Open the [README.md](../README.md) file directly\n - Refer to the original extension repository on GitHub\n- Visit [https://www.e-mergo.nl/e-mergo-tools-bundle](https://www.e-mergo.nl/e-mergo-tools-bundle/?utm_medium=download&utm_source=tools_bundle&utm_campaign=E-mergo_Extension&utm_term=toolsbundle&utm_content=sitelink) for more information");
-	});
+		return function() {
+			$("#".concat(id)).remove();
+		};
+	},
 
 	/**
 	 * Dissect the metadata from the markdown content
 	 *
-	 * @param  {String}  content        Markdown content
+	 * @param  {String}  md             Markdown content
 	 * @param  {Boolean} returnMetadata Optional. Whether to return the metadata instead of the stripped content. Defaults to false.
 	 * @return {String}                 Stripped content
 	 */
-	function stripMarkdownMetadata( content, returnMetadata ) {
-		var metadata = "", strippedContent = content;
+	stripMarkdownMetadata = function( md, returnMetadata ) {
+		var metadata = "", strippedContent = md;
 
-		// Metadata starts at line 1 with `---`
-		if (0 === content.indexOf("---")) {
-			var stripPosition = content.substring(3).indexOf("---") + 4;
+		// Metadata starts at the first line with `---\r\n`
+		if (0 === md.indexOf("---\r\n")) {
+			var stripPosition = md.substring(3).indexOf("---") + 5;
 
 			// Define stripped parts
-			metadata = content.substring(4, stripPosition - 1);
-			strippedContent = content.substring(stripPosition + 3);
+			metadata = md.substring(5, stripPosition - 1);
+			strippedContent = md.substring(stripPosition + 4);
 		}
 
 		return returnMetadata ? metadata : strippedContent;
-	}
+	},
 
 	/**
 	 * Parse the metadata from the markdown content
 	 *
-	 * @param  {String} content Markdown content
-	 * @return {Object}         Metadata
+	 * @param  {String} md Markdown content
+	 * @return {Object}    Metadata
 	 */
-	function parseMarkdownMetadata( content ) {
-		var obj = {}, i, metadata = stripMarkdownMetadata(content, true);
+	parseMarkdownMetadata = function( md ) {
+		var obj = {}, i, metadata = stripMarkdownMetadata(md, true);
 
-		(metadata ? metadata.split("\n") : []).forEach( function( value, index ) {
+		// Iterate metadata lines
+		(metadata ? metadata.split("\r\n") : []).forEach( function( value, index ) {
 			i = value.indexOf(":");
 			if (-1 !== i) {
 				obj[value.substring(0, i).toLowerCase()] = value.substring(i + 2);
@@ -99,19 +113,39 @@
 		});
 
 		return obj;
-	}
+	},
+
+	/**
+	 * Return the extension's home url
+	 *
+	 * @param  {String} md Markdown content
+	 * @return {String}    Extension home url
+	 */
+	getExtensionHomeUrl = function( md ) {
+		var url = "", proxy, metadata = parseMarkdownMetadata(md);
+
+		if (metadata.qext) {
+			proxy = 0 === window.location.pathname.indexOf("/extensions/")
+				? window.location.pathname.split("/extensions/")[0]
+				: window.location.pathname.split("/sense/")[0];
+
+			url = "".concat(window.location.protocol, "//", window.location.host, proxy, "/extensions/", metadata.qext.split(".")[0]);
+		}
+
+		return url;
+	},
 
 	/**
 	 * Get the headings from the markdown content
 	 *
-	 * @param  {String} content Markdown content
-	 * @return {Array}          Headings
+	 * @param  {String} md Markdown content
+	 * @return {Array}     Headings
 	 */
-	function getMarkdownHeadings( content ) {
+	getMarkdownHeadings = function( md ) {
 		var headings = [],
 		    headingRegex = /\n(#+\s*)(.*)/g,
 		    headingLevelRegex = /\n(#+\s*)/g,
-		    matches = content.match(headingRegex);
+		    matches = md.match(headingRegex);
 
 		// Headings were found
 		if (matches && matches.length) {
@@ -121,44 +155,100 @@
 					level: heading.match(headingLevelRegex)[0].length - 2,
 					text: heading.replace(headingLevelRegex, "")
 				};
+
+			// Remove h1 headings
+			}).filter( function( heading ) {
+				return 1 !== heading.level;
 			});
 		}
 
 		return headings;
-	}
+	},
 
 	/**
 	 * Insert heading anchors in the markdown content
 	 *
-	 * @param  {String} content Markdown content
-	 * @return {String}         Parsed content
+	 * @param  {String} md Markdown content
+	 * @return {String}    Parsed content
 	 */
-	function insertMarkdownHeadingAnchors( content ) {
+	insertMarkdownHeadingAnchors = function( md ) {
 		var headingLevelRegex = /\n(#+)\s*/g,
 		    replacer = function( index ) {
 		    	return function( match ) {
 					return match.replace(headingLevelRegex, function( heading ) {
-						return heading + " <a name=\"heading-" + (index+1) + "\"></a>";
+						return "".concat(heading, " <a name=\"heading-", index + 1, "\"></a>");
 					});
 		    	};
 		    };
 
 		// Headings were found
-		getMarkdownHeadings(content).forEach( function( heading, index ) {
-			content = content.replace(heading.heading, replacer(index));
+		getMarkdownHeadings(md).forEach( function( heading, index ) {
+			md = md.replace(heading.heading, replacer(index));
 		});
 
-		return content;
-	}
+		return md;
+	},
+
+	/**
+	 * Return the details of the document
+	 *
+	 * @param  {Object} props Details
+	 * @param  {String} md    Optional. Markdown content
+	 * @return {Array}        Document details
+	 */
+	getDocDetails = function( props, md ) {
+		var details = [];
+
+		props = props || {};
+
+		// Page subtitle
+		if (props.description) {
+			details.push({
+				className: "subtitle",
+				html: props.description
+			});
+		}
+
+		// Page version
+		if (props.version) {
+			details.push({
+				className: "version",
+				html: "Version: ".concat(props.version)
+			});
+		}
+
+		// Page license
+		if (props.license) {
+			var url = md ? getExtensionHomeUrl(md) : "..";
+
+			details.push({
+				className: "license",
+				html: "License: <a target=\"_blank\" href=\"".concat(url, "/LICENSE.txt\">", props.license, "</a>")
+			});
+		}
+
+		// Bundle context
+		if (props.bundle) {
+			details.push({
+				className: "context",
+				title: props.bundle.description,
+				html: "Part of the ".concat(props.bundle.url ? "<a target=\"_blank\" href=\"".concat(props.bundle.url, "\">", props.bundle.name, "</a>") : props.bundle.name)
+			});
+		}
+
+		return details;
+	},
 
 	/**
 	 * Define the details on the document
 	 *
+	 * @param  {Object} $doc  Document element
 	 * @param  {Object} props Details
+	 * @param  {String} md    Optional. Markdown content
 	 * @return {Void}
 	 */
-	function setupDocDetails( props ) {
-		var $header = $("#header");
+	setupDocDetails = function( $doc, props, md ) {
+		var $header = $doc.find("#header");
 
 		props = props || {};
 		props.title = props.title || props.name;
@@ -168,87 +258,200 @@
 			$header.find("#extension-title").text(props.title);
 
 			// Specify document title
-			$("title").prepend(props.title + " - ");
+			$("title").prepend(props.title.concat(" - "));
 		}
 
-		// Page subtitle
-		if (props.description) {
+		// Insert details
+		getDocDetails(props, md).forEach( function( detail ) {
 			$header.find("hgroup").append(
-				$("<span></span>").addClass("subtitle").text(props.description)
+				$("<span></span>").addClass(detail.className).attr("title", detail.title).html(detail.html)
 			);
-		}
+		});
+	},
 
-		// Page version
-		if (props.version) {
-			$header.find("hgroup").append(
-				$("<span></span>").addClass("version").text("Version: " + props.version)
-			);
-		}
+	/**
+	 * Return the rendered documentation content
+	 *
+	 * @param  {String} md Markdown content
+	 * @return {String}    HTML content
+	 */
+	prepareContent = function( md ) {
 
-		// Page license
-		if (props.license) {
-			$header.find("hgroup").append(
-				$("<span></span>").addClass("license").text("License: ").append(
-					$('<a target="_blank"></a>').text(props.license).attr("href", "../LICENSE.txt")
-				)
-			);
-		}
+		// Strip h1 headings
+		md = md.replace(/(\n# \s*.*)/g, "");
 
-		// Bundle context
-		if (props.bundle) {
-			var bundleUrl = props.bundle.url;
-			$header.find("hgroup").append(
-				$("<span></span>").addClass("context").attr("title", props.bundle.description).text("Part of the ").append(
-					bundleUrl ? $('<a target="_blank"></a>').text(props.bundle.name).attr("href", bundleUrl) : props.bundle.name
-				)
-			);
-		}
-	}
+		// Add heading anchors
+		md = insertMarkdownHeadingAnchors(md);
+
+		return MD.render(md);
+	},
 
 	/**
 	 * Define the main content of the document
 	 *
-	 * @param  {String} content Markdown content
+	 * @param  {Object} $doc Document element
+	 * @param  {String} md   Markdown content
 	 * @return {Void}
 	 */
-	function setupDocContent( content ) {
+	setupDocContent = function( $doc, md ) {
 
-		// Strip h1 headings
-		content = content.replace(/(\n# \s*.*)/g, "");
-
-		// Add heading anchors
-		content = insertMarkdownHeadingAnchors(content);
-
-		$("#content").append(MD.render(content));
-	}
+		// Render and add the content
+		$doc.find("#content").append(prepareContent(md));
+	},
 
 	/**
 	 * Define the table of contents based on the markdown content
 	 *
-	 * @param  {String} content Markdown content
+	 * @param  {Object} $doc Document element
+	 * @param  {String} md   Markdown content
 	 * @return {Void}
 	 */
-	function setupDocToc( content ) {
-		var toc = getMarkdownHeadings(content);
+	setupDocToc = function( $doc, md ) {
+		var toc = getMarkdownHeadings(md);
 
 		// Headings were found
 		if (toc.length) {
 
-			// Remove h1 headings
-			toc = _.reject(toc, function( heading ) {
-				return heading.level === 1;
-			});
-
 			// Add toc elements in the list, with anchors
-			$("#navigation ul").append(toc.map( function( heading, index ) {
-				return $("<li></li>").addClass("level-" + heading.level).append(
+			$doc.find("#navigation ul").append(toc.map( function( heading, index ) {
+				return $("<li></li>").addClass("level-".concat(heading.level)).append(
 					$("<a></a>").attr({
-						href: "#heading-" + (index+1),
-						title: "Navigate to `" + heading.text + "`"
+						href: "#heading-".concat(index + 1),
+						title: "Navigate to `".concat(heading.text, "`")
 					}).text(heading.text)
 				);
 			}));
 		}
-	}
+	},
 
-})( window, jQuery, _ );
+	/**
+	 * Setup the document based on the readme text
+	 *
+	 * @param  {Object} $doc Document element
+	 * @param  {String} md   Markdown content
+	 * @param  {Object} qext Optional. Extension QEXT data
+	 * @return {Void}
+	 */
+	setupDoc = function( $doc, md, qext ) {
+		var content = stripMarkdownMetadata(md), metadata;
+
+		// QEXT-based metadata
+		if (qext) {
+			setupDocDetails($doc, qext, md);
+
+		// Find metadata in readme
+		} else {
+			metadata = parseMarkdownMetadata(md);
+
+			// Readme contains metadata
+			if (metadata.qext) {
+				$.get("../".concat(metadata.qext)).then( function( qext ) {
+					setupDocDetails($doc, qext, md);
+				}).catch( function() {
+					setupDocDetails($doc, metadata, md);
+				});
+			} else {
+				setupDocDetails($doc, metadata, md);
+			}
+		}
+
+		// Setup content
+		setupDocContent($doc, content);
+
+		// Setup navigation
+		setupDocToc($doc, content);
+
+		// Tag body with success class
+		$doc.addClass("readme-loaded");
+	},
+
+	/**
+	 * Holds the modal for the extension documentation
+	 *
+	 * @type {Object}
+	 */
+	modal,
+
+	/**
+	 * Setup the documentation modal based on the readme text
+	 *
+	 * @param  {String} md   Documentation content
+	 * @param  {Object} qext Extension QEXT data
+	 * @return {Void}
+	 */
+	showModal = function( md, qext ) {
+		var modalId = "qs-emergo-extension-documentation";
+
+		// Bail when the modal is already in use
+		if (modal) {
+			return;
+		}
+
+		// Add global styles to the page
+		registerStyle(modalId, css);
+
+		// Parse readme
+		var content = stripMarkdownMetadata(md);
+
+		// Open the modal
+		modal = qvangular.getService("luiDialog").show({
+			template: modalTmpl,
+			controller: ["$scope", function( $scope ) {
+
+				/**
+				 * Scroll to heading
+				 *
+				 * Ignore ìnserted `<a></a>` heading anchors because their
+				 * `name` attributes are stripped by Angular on inserting
+				 * raw HTML. Rather than applying unsafe HTML practices like
+				 * using `$sce.trustAsHtml()`, a different method for finding
+				 * headings is used.
+				 *
+				 * @param  {Number} num Heading number
+				 * @return {Void}
+				 */
+				$scope.scrollTo = function( num ) {
+					var $el = $("#".concat(modalId)).find("h2,h3,h4,h5,h6").eq(num - 1);
+					$el.length && $el[0].scrollIntoView();
+				};
+
+				/**
+				 * Provide modal close method to the template
+				 *
+				 * @return {Void}
+				 */
+				$scope.close = function() {
+					modal.close();
+				};
+			}],
+			input: {
+				title: "Extension documentation for ".concat(qext.name),
+				extensionTitle: qext.title || qext.name,
+				content: prepareContent(content),
+				docDetails: getDocDetails(qext, md),
+				toc: getMarkdownHeadings(content),
+				homeUrl: getExtensionHomeUrl(md)
+			},
+			closeOnEscape: true
+		});
+
+		// Reset modal when closing the modal
+		modal.closed.then( function() {
+			modal = null;
+		});
+	};
+
+	return {
+		stripMarkdownMetadata: stripMarkdownMetadata,
+		parseMarkdownMetadata: parseMarkdownMetadata,
+		getExtensionHomeUrl: getExtensionHomeUrl,
+		getMarkdownHeadings: getMarkdownHeadings,
+		insertMarkdownHeadingAnchors: insertMarkdownHeadingAnchors,
+		getDocDetails: getDocDetails,
+		setupDocDetails: setupDocDetails,
+		setupDocContent: setupDocContent,
+		setupDocToc: setupDocToc,
+		setupDoc: setupDoc,
+		showModal: showModal
+	};
+})));
