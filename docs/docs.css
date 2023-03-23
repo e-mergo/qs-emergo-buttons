@@ -299,3 +299,35 @@
 	font-style: italic;
 	padding-bottom: 10px;
 }
+
+/* Modal */
+
+.lui-modal-background:not(.lui-fade):has(+ .qs-emergo-modal) {
+	opacity: .5;
+}
+
+.qs-emergo-modal .lui-dialog__header {
+	display: flex;
+	justify-content: space-between;
+	height: 24px;
+	padding: 12px 8px 12px 12px;
+	box-sizing: content-box;
+	background-color: #fafafa;
+	border-bottom: 1px rgba(0, 0, 0, 0.15) solid;
+	line-height: 24px;
+}
+
+.qs-emergo-modal .lui-dialog__title {
+	font-size: 16px;
+	font-weight: 400;
+	line-height: 24px;
+}
+
+.qs-emergo-modal .qs-emergo-modal-close {
+	height: 30px;
+	margin-top: -2px;
+	padding: 7px;
+	background: transparent;
+	border: none;
+	cursor: pointer;
+}

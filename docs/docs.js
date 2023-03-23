@@ -1,10 +1,8 @@
 /**
  * E-mergo QS Extension documentation script
  *
- * @since 20190802
+ * @version 20230322
  * @author Laurens Offereins <https://www.github.com/lmoffereins>
- *
- * @version 20230717
  */
 (function( window, $, _, factory ) {
 
