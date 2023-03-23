@@ -5,6 +5,8 @@
  * @param  {Object} _             Underscore library
  * @param  {Object} util          E-mergo utility functions
  * @param  {Object} emergoActions E-mergo Actions API
+ * @param  {Object} docs          E-mergo documentation functions
+ * @param  {String} readme        Extension readme
  * @param  {String} qext          Extension QEXT data
  * @return {Object}               Extension Property Panel definition
  */
@@ -13,8 +15,10 @@ define([
 	"underscore",
 	"./util/util",
 	"./util/qs-emergo-actions",
+	"./docs/docs",
+	"text!./README.md",
 	"text!./qs-emergo-buttons.qext"
-], function( qlik, _, util, emergoActions, qext ) {
+], function( qlik, _, util, emergoActions, docs, readme, qext ) {
 
 	/**
 	 * Holds the QEXT data
@@ -447,11 +451,9 @@ define([
 				label: "Open documentation",
 				component: "button",
 				action: function() {
-					util.requireMarkdownMimetype()
-						// Regardless of registration success, send to the docs
-						.finally( function() {
-							window.open(window.requirejs.toUrl("extensions/qs-emergo-buttons/docs/docs.html"), "_blank");
-						});
+					util.requireMarkdownMimetype().finally( function() {
+						docs.showModal(readme, qext);
+					});
 				}
 			}
 		}
