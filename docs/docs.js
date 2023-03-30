@@ -1,7 +1,7 @@
 /**
  * E-mergo QS Extension documentation script
  *
- * @version 20230322
+ * @version 20230330
  * @author Laurens Offereins <https://www.github.com/lmoffereins>
  */
 (function( window, $, _, factory ) {
@@ -437,6 +437,21 @@
 		modal.closed.then( function() {
 			modal = null;
 		});
+	},
+
+	// Remember default link renderer, if overridden, or proxy to default renderer
+	defaultLinkRender = MD.renderer.rules.link_open || function( tokens, idx, options, env, self ) {
+		return self.renderToken(tokens, idx, options);
+	};
+
+	// Overwrite link renderer to have links always open in a new tab
+	MD.renderer.rules.link_open = function( tokens, idx, options, env, self ) {
+
+		// Set target="_blank" attribute
+		tokens[idx].attrPush(['target', '_blank']);
+
+		// Pass token to default renderer
+		return defaultLinkRender(tokens, idx, options, env, self);
 	};
 
 	return {
