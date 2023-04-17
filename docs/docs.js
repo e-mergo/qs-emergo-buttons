@@ -1,7 +1,7 @@
 /**
  * E-mergo QS Extension documentation script
  *
- * @version 20230330
+ * @version 20230417
  * @author Laurens Offereins <https://www.github.com/lmoffereins>
  */
 (function( window, $, _, factory ) {
@@ -45,6 +45,33 @@
 		linkify: true,
 		typographer: true
 	}),
+
+	/**
+	 * Add global link element to the page
+	 *
+	 * @param  {String} name  Link name
+	 * @param  {Object} attrs Element attributes {@link https://api.jquery.com/attr/#attr-attributes}
+	 * @return {Function} Deregister method
+	 */
+	registerLink = function( name, attrs ) {
+		var id = name.concat("-link"),
+		    $link = $("#".concat(id));
+
+		attrs = attrs || {};
+
+		// Replace style when it already exists
+		if ($link.length) {
+			$link.attr(attrs);
+
+		// Add style
+		} else {
+			$("<style>").attr("id", id).attr(attrs).appendTo("head");
+		}
+
+		return function() {
+			$("#".concat(id)).remove();
+		};
+	},
 
 	/**
 	 * Add global styles to the page, replacing when it already exists
@@ -386,6 +413,10 @@
 		}
 
 		// Add global styles to the page
+		registerLink(modalId, {
+			rel: "stylesheet",
+			href: "https://fonts.googleapis.com/css2?family=Dosis:wght@300;400;500;700&display=swap"
+		});
 		registerStyle(modalId, css);
 
 		// Parse readme
