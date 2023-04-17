@@ -6,7 +6,6 @@
  * @param  {Object} util          E-mergo utility functions
  * @param  {Object} emergoActions E-mergo Actions API
  * @param  {Object} docs          E-mergo documentation functions
- * @param  {String} readme        Extension readme
  * @param  {String} qext          Extension QEXT data
  * @return {Object}               Extension Property Panel definition
  */
@@ -16,9 +15,8 @@ define([
 	"./util/util",
 	"./util/qs-emergo-actions",
 	"./docs/docs",
-	"text!./README.md",
 	"text!./qs-emergo-buttons.qext"
-], function( qlik, _, util, emergoActions, docs, readme, qext ) {
+], function( qlik, _, util, emergoActions, docs, qext ) {
 
 	/**
 	 * Holds the QEXT data
@@ -450,9 +448,13 @@ define([
 			help: {
 				label: "Open documentation",
 				component: "button",
-				action: function() {
+				action: function( props ) {
 					util.requireMarkdownMimetype().finally( function() {
-						docs.showModal(readme, qext);
+						var readmeFile = window.requirejs.toUrl("extensions/".concat(props.qInfo.qType, "/README.md"));
+
+						require(["text!".concat(readmeFile)], function( readme ) {
+							docs.showModal(readme, qext);
+						});
 					});
 				}
 			}
