@@ -89,7 +89,7 @@ define([
 			var cb = getBtn.bind(this, button.cId);
 
 			// Execute button actions when not editing the sheet and interaction is allowed
-			if (! $scope.object.inEditState() && ! $scope.options.noInteraction) {
+			if (! $scope.object.inEditState() && ! ($scope.options && $scope.options.noInteraction)) {
 				emergoActions.doMany(cb, $scope).then( function( done ) {
 
 					// Evaluate navigation settings
@@ -118,7 +118,7 @@ define([
 			};
 
 			// Indicate when interaction is not allowed
-			if ($scope.options.noInteraction) {
+			if ($scope.options && $scope.options.noInteraction) {
 				classes.push('no-interaction');
 			}
 
