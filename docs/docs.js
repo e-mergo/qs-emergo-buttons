@@ -1,7 +1,7 @@
 /**
  * E-mergo QS Extension documentation script
  *
- * @version 20230417
+ * @version 20230418
  * @author Laurens Offereins <https://www.github.com/lmoffereins>
  */
 (function( window, $, _, factory ) {
@@ -11,7 +11,7 @@
 
 		// When using modules
 		if ("function" === typeof define && define.amd) {
-			define(["./lib/markdown-it", "jquery", "underscore", "qvangular", "text!./docs.css", "text!./modal.html"], factory);
+			define(["./lib/markdown-it", "jquery", "underscore", "qvangular", "translator", "../util/util", "text!./docs.css", "text!./modal.html"], factory);
 		} else {
 			alert("Sorry! Could not locate Qlik Sense libraries necessary for generating this documentation page.");
 		}
@@ -33,7 +33,7 @@
 			docs.setupDocContent($doc, "## Oops, something went wrong\nThe file containing the extension's documentation named `README.md` could not be loaded.\n\nPlease try to open the extension's documentation once with a RootAdmin account or else either visit the [README file](./../README.md) directly or refer to the documentation in the original extension repository or go to [www.e-mergo.nl](https://www.e-mergo.nl/e-mergo-tools-bundle/?utm_medium=download&utm_source=tools_bundle&utm_campaign=E-mergo_Extension&utm_term=toolsbundle&utm_content=sitelink) for more information.");
 		});
 	}
-}(this, jQuery, _, (function( markdownit, $, _, qvangular, css, modalTmpl ) {
+}(this, jQuery, _, (function( markdownit, $, _, qvangular, translator, util, css, modalTmpl ) {
 
 	/**
 	 * Holds configured Markdown-it instance
@@ -462,6 +462,18 @@
 				homeUrl: getExtensionHomeUrl(md)
 			},
 			closeOnEscape: true
+		});
+
+		// Register events when opening the modal
+		modal.opened.then( function() {
+
+			// Insert copy-code button for each <pre> block
+			// By default Qlik's interface is blocked from selecting and copying text.
+			$("#".concat(modalId, " pre")).each( function( ix, pre ) {
+				var $pre = $(pre).prepend( $("<button type='button'>".concat(translator.get("Common.Copy"), "</button>")).on("click", function() {
+					util.copyToClipboard($pre.find("code")[0].innerHTML);
+				}) );
+			});
 		});
 
 		// Reset modal when closing the modal
