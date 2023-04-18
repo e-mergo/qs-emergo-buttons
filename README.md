@@ -1,7 +1,7 @@
 ---
-Qlik Sense Visualization Extension
+Type: Qlik Sense Visualization Extension
 Name: E-mergo Buttons
-Version: 1.3.20200918
+Version: 1.4-beta
 QEXT: qs-emergo-buttons.qext
 ---
 
@@ -216,7 +216,20 @@ Requests for additional features can be posted in the extension's GitHub reposit
 
 ## Changelog
 
-#### 1.3.20200918 - QS Sept 2020
+#### 1.4-beta - QS November 2022
+- Ready for Qlik Cloud.
+- Renamed extension label to improve discoverability in the extensions list.
+- Added the _Call REST API_ action.
+- Fixed parsing actions in between action executions, so that subsequent actions are re-evaluated with engine updates.
+- Fixed chaining actions and navigation. Broken action chains will no longer trigger navigation.
+- Fixed extension interaction and execution of actions when in noInteraction or noSelections mode.
+- Fixed sorting of actions.
+- Fixed rendering of empty buttons.
+- Fixed switching applied palette colors when the app's theme is changed.
+- Updated documentation examples for Dynamic button mode.
+- Updated docs files.
+
+#### 1.3.20200918 - QS September 2022
 - Added the _Request confirmation_ action.
 - Removed global disabled state of the button set.
 
