@@ -77,7 +77,7 @@ define([
 		 *
 		 * @type {Object} Cache functions
 		 */
-		var cache = util.createCache("qs-emergo-buttons/" + $scope.$id);
+		var cache = util.createCache("qs-emergo-buttons/".concat($scope.$id));
 
 		/**
 		 * Button select handler

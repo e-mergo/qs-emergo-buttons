@@ -17,14 +17,18 @@ This extension is [hosted on GitHub](https://github.com/e-mergo/qs-emergo-button
 As per version November 2018, Qlik Sense ships with the *Qlik Dashboard bundle* for 'advanced authoring'. The bundle contains the *Button for navigation* and *Variable input* extensions, both forks of their respective open-source community productions. These extensions however have their limits:
 - Display a single button per visualization (does not apply for *Variable input*)
 - Use a limited set of actions per button
+- No option of conditional enabling/disabling
+
+Untill the integration of the *Button* visualisation in the core set of Qlik's visualisations, the following issues were present as well:
 - Limited coloring options
 - Limited conditional showing/hiding
 
-This extension provides an alternative to these limited visualizations, by offering the following features:
+This extension provides an alternative to these limited visualizations by offering the following features:
 - Displaying unlimited buttons per visualization, both static and dynamically created
 - Using unlimited actions per button
 - Custom coloring options, using the color picker or an expression
 - Conditional showing/hiding per button
+- Conditional enabling/disabling per button
 
 On top of that, this extension comes with an additional set of actions which enhance the possibilities of user interaction within Qlik Sense.
 
@@ -42,7 +46,7 @@ There are two ways of adding buttons to a visualization of this extension.
 2. Create a dynamic set of buttons. Do this by switching to *Dynamic* mode and entering an expression that returns a text, seperating buttons with the `|`-character.
 
 #### Dynamic buttons
-Dynamic mode offers also a way of working with dynamic per-button characteristics. By default, the result of the dynamic expression is interpreted as button labels by separating buttons on the `|`-character. In addition, additional parameters can be provided with the `~`-seperator. These parameters can then be used in the dynamic button definition by using as `$1` through `$n`, for as many parameters as you define. With dynamic parameters you can dynamically determine details like the button's color values, action parameters (for example the *Select Field Value*'s field and value parts) or navigation values (for example the *Navigate to URI* value part). Note that these values are only parsed after Qlik's engine has processed all expressions.
+Dynamic mode offers also a way of working with dynamic per-button characteristics. By default, the result of the dynamic expression is interpreted as button labels by separating buttons on the `|`-character. In addition, additional parameters can be provided with the `~`-seperator. These parameters can then be used in the dynamic button definition by using as `$1` through `$n`, for as many parameters as are defined. With dynamic parameters you can dynamically determine details like the button's color values, action parameters (for example the *Select Field Value*'s field and value parts) or navigation values (for example the *Navigate to URI* value part). Note that these values are only parsed after Qlik's engine has processed all expressions.
 
 The dynamic nature of the buttons is **only** based in the main expression. Besides using the `$`-parameter references, expressions for details in other fields *cannot* be interpreted for each particular button. Instead, the expressions will result in values equal for the entire button set.
 
@@ -52,30 +56,26 @@ The dynamic nature of the buttons is **only** based in the main expression. Besi
 The above expression generates three buttons. As no `~` was found separating button parameters, only the `$1` parameter is available. Use this parameter for the *Label* setting.
 
 ##### Example 2
-	=Concat({1} Distinct
+    =Concat({1} Distinct
 
-	    // First parameter $1: button label
-	    Alpha &
+        // First parameter $1: button label
+        Alpha &
 
-	    // Parameter separator
-	    '~' &
+        // Parameter separator
+        '~' &
 
-	    // Second parameter $2: color expression
-	    If ( SubStringCount(GetFieldSelections(Alpha, ',', 26), Alpha), 
-	        '#1abe32', // Color for selected values
-	        If ( NOT SubStringCount('$(=Concat({<Alpha>} distinct Alpha, ','))', Alpha),
-	            '#a9a9a9', // Color for excluded values
-	            If ( GetSelectedCount(Alpha),
-	                '#ddd', // Color for alternative values
-	                '' // No color for possible values
-	            )
-	        )
-	    )
-	, '|')
+        // Second parameter $2: color expression
+        If ( SubStringCount(GetFieldSelections(Alpha, ',', 26), Alpha),
+            '#1abe32', // Color for selected values
+            If ( NOT SubStringCount('$(=Concat({<Alpha>} distinct Alpha, ','))', Alpha),
+                '#a9a9a9' // Color for excluded values
+            )
+        )
+    , '|')
 
 The above expression generates as many buttons as there are distinct values in the field `Alpha`. The resulting text for example could look like the following, generating five buttons:
 
-	A~#ddd|B~#1abe32|C~|D~|E~#a9a9a9
+    A~#ddd|B~#1abe32|C~|D~|E~#a9a9a9
 
 As the `~` separates button parameters, two parameters are found: `$1` containing the content of `Alpha`, while `$2` contains the conditionally calculated color code. Following the example, this would be A, B, C, D, E for the first parameter, and the second parameter contains a color code for the first, second and fifth button (A, B, E). The color code is based on whether the concatenated value is either selected, by checking whether it exists in the field's active selections, is excluded, by checking whether it does not exist in the field's possible values, is an alternative value, by checking whether there are any selections in the field, or it is a possible value. For all possible values the no-value is chosen for color, leaving the button white with a visible border.
 
@@ -93,10 +93,10 @@ To furthur dissect the expression:
 - `NOT SubStringCount('$(=Concat({<Alpha>} distinct Alpha, ','))', Alpha)` checks whether the iterated value of `Alpha` is present in the current available set of values in `Alpha`. This is executed in a dollar-expanded expression because nested aggregations are not accepted. The `NOT` prefix inverses the result of the expression, which means it checks if the value is *not* an available value and therefor excluded.
 
 ##### Safety limit
-When the returned set of buttons from the expression is too large, the extension's logic may overload the browser's memory. To prevent this, a built-in safety limit of 100 buttons is enabled. If you know what you are doing, you can disable this limit. Another way to prevent too many buttons is to make sure to return only unique field values in the expression by using `Distinct`.
+When the returned set of buttons from the expression is too large, the extension's logic may overload the browser's memory. To prevent this, a built-in safety limit of 100 buttons is enabled. If you know what you are doing, you can disable this limit. A way to prevent too many buttons is to make sure to return only unique field values in the expression by using `Distinct`.
 
 ### Label (Icons)
-Button labels are parsed for icons that match existing ones in Qlik's own icon set. An icon is matched on the following definition: `#icon-name#`. The icon name is the part of an icon's class name without the `lui-icon--` prefix. The available icons are listed in the provided <a href="../lib/icons-lui.json" target="_blank">JSON file</a>.
+Button labels are parsed for icons that match existing ones in Qlik's own icon set. An icon is matched on the following definition: `#icon-name#`. The icon name is the part of an icon's class name without the `lui-icon--` prefix. The available icons are listed in the provided <a href="../lib/icons-lui.json" target="_blank">JSON file</a> or view the (older) icon set at <a href="https://qlik-oss.github.io/leonardo-ui/icons.html" target="_blank">qlik-oss.github.io</a>.
 
 ### Description
 Button descriptions are applied as the button's `title` HTML atribute. It is shown when hovering the button.
@@ -163,6 +163,16 @@ Note that the following requirements apply:
 
 #### Apply Theme
 This action sets the current Qlik Sense visual theme to the specified theme. You can pick from a list of available themes in the current app. This functionality allows for theme-switching for use cases like font-scaling, different color tones, etcetera.
+
+#### Call REST API
+This action sends a request to a REST API. As this is a simple implementation of sending an HTTP request, interpretation of the response content is up to the developer. The response content will be parsed into a JSON string and stored in the selected variable. The following parameters of the request are configurable:
+- **Location** The URI to send the request to.
+- **Method** The HTTP method of the request.
+- **Headers** Additional HTTP headers to send with the requst.
+- **Body** The optional request body. The provided string will be interpreted as a JSON object.
+- **Variable** The variable to store the response content into.
+
+Note that when using this action in Qlik Cloud the requested resource locations need to be allowlisted in the Content Security Policy (CSP) administration section (as `connect-src`). Refer to your tenant's administrator when you have no permission to create new CSP entries.
 
 #### Log to Console
 This action logs the result of the provided expression to the browser's console. This functionality is provided for debugging purposes.
