@@ -250,17 +250,21 @@
 	font-family: monospace;
 	font-size: 13px;
 	background: #f4f4f4;
-	padding: 15px 20px;
 	white-space: pre;
-	overflow-x: auto;
+	overflow: hidden;
 }
 
 #qs-emergo-extension-documentation #content pre button {
 	position: absolute;
-	top: 13px;
+	top: 12px;
 	right: 15px;
 	padding: 2px 4px;
 	cursor: pointer;
+}
+
+#qs-emergo-extension-documentation #content pre div {
+	padding: 15px 20px;
+	overflow-x: auto;
 }
 
 #qs-emergo-extension-documentation #content :not(pre) code {

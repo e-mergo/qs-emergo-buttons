@@ -482,19 +482,31 @@
 		});
 	},
 
-	// Remember default link renderer, if overridden, or proxy to default renderer
-	defaultLinkRender = MD.renderer.rules.link_open || function( tokens, idx, options, env, self ) {
+	// Remember default `code_block` renderer, if overridden, or proxy to default renderer
+	defaultCodeBlockRenderer = MD.renderer.rules.code_block || function( tokens, idx, options, env, self ) {
+		return self.renderToken(tokens, idx, options);
+	},
+
+	// Remember default `link_open` renderer, if overridden, or proxy to default renderer
+	defaultLinkOpenRenderer = MD.renderer.rules.link_open || function( tokens, idx, options, env, self ) {
 		return self.renderToken(tokens, idx, options);
 	};
 
-	// Overwrite link renderer to have links always open in a new tab
+	// Overwrite `code_block` renderer to wrap code in a div
+	MD.renderer.rules.code_block = function( tokens, idx, options, env, self ) {
+
+		// Pass token to default renderer, then insert div wrapper
+		return defaultCodeBlockRenderer(tokens, idx, options, env, self).replace("<code>", "<div><code>").replace("</code>", "</code></div>");
+	};
+
+	// Overwrite `link_open` renderer to have links always open in a new tab
 	MD.renderer.rules.link_open = function( tokens, idx, options, env, self ) {
 
-		// Set target="_blank" attribute
+		// Set target '_blank' attribute
 		tokens[idx].attrPush(['target', '_blank']);
 
 		// Pass token to default renderer
-		return defaultLinkRender(tokens, idx, options, env, self);
+		return defaultLinkOpenRenderer(tokens, idx, options, env, self);
 	};
 
 	return {
