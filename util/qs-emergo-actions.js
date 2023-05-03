@@ -1,7 +1,7 @@
 /**
  * E-mergo Actions Utility Library
  *
- * @version 20230306
+ * @version 20230503
  * @author Laurens Offereins <https://github.com/lmoffereins>
  *
  * @param  {Object} qlik       Qlik's core API
@@ -2149,7 +2149,7 @@ define([
 			label: function( item ) {
 				var labels = {
 					"default": "Select a variable for storing the response of the REST call. Use the variable to further process the response.",
-					"json": "Define any amount of properties from the JSON response of the REST call to be stored in a variable. Lookup paths must be specified according to RFC 6901. Use the variable(s) to further process the response.",
+					"json": "Store any amount of properties from the JSON response of the REST call following a path into a variable. The lookup path must be specified according to RFC 6901. Use the variable(s) to further process the response.",
 				};
 
 				return item.restApiResponse && labels[item.restApiResponse] || labels.default;
