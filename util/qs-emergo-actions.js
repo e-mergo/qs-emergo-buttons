@@ -1352,18 +1352,52 @@ define([
 				}, {}),
 				data: item.restApiBody.length ? JSON.parse(item.restApiBody) : null
 			}).then( function( response ) {
+				if (response.data) {
 
-				// Store response in a variable
-				if (response.data && item.variable) {
-					return setVariable({
-						variable: item.variable,
-						/**
-						 * Escape single quotes by quoting twice
-						 *
-						 * @see https://community.qlik.com/t5/Design/Escape-sequences/ba-p/1469770
-						 */
-						value: JSON.stringify(response.data, null, "  ").replace(/'/g, "''")
-					}, context);
+					// Consider selected response type
+					switch (item.restApiResponse) {
+						case "json":
+							return item.restApiResponseJson.reduce( function( promise, jsonItem ) {
+								/**
+								 * Convert path according to RFC 9601 for use with Underscore's `get()`
+								 * - Remove starting slash
+								 * - Convert to array
+								 * - Convert placeholders for / and ~
+								 *
+								 * @see https://datatracker.ietf.org/doc/html/rfc6901
+								 */
+								var path = jsonItem.path.replace(/^\//, "").split("/").map(a => a.replace(/(~1)/g, "/")).map(a => a.replace(/(~0)/g, "~"));
+
+								return promise.then( function() {
+									var jsonValue = _.get(response.data, path);
+
+									if (jsonItem.variable) {
+										return setVariable({
+											variable: jsonItem.variable,
+											value: JSON.stringify(jsonValue, null, "  ").replace(/'/g, "''")
+										}, context);
+									}
+								});
+							}, $q.resolve());
+
+							break;
+
+						case "default":
+						default:
+
+							// Store response in a variable
+							if (item.variable) {
+								return setVariable({
+									variable: item.variable,
+									/**
+									 * Escape single quotes by quoting twice
+									 *
+									 * @see https://community.qlik.com/t5/Design/Escape-sequences/ba-p/1469770
+									 */
+									value: JSON.stringify(response.data, null, "  ").replace(/'/g, "''")
+								}, context);
+							}
+					}
 				} else {
 					return $q.reject({ message: "Could not retreive data from the response." });
 				}
@@ -1943,6 +1977,31 @@ define([
 	e = 0,
 
 	/**
+	 * Return the list of variables
+	 *
+	 * @return {Promise} List of variable options
+	 */
+	getVariableList = function() {
+		var dfd = $q.defer(),
+		    def = {
+				qVariableListDef:{
+					qType:"variable"
+				}
+			};
+
+		app.createGenericObject(def).then( function( object ) {
+			dfd.resolve(object.layout.qVariableList.qItems.map( function( b ) {
+				return {
+					value: b.qName,
+					label: 50 < b.qName.length ? b.qName.slice(0, 50).concat("&hellip;") : b.qName
+				};
+			}));
+		});
+
+		return dfd.promise;
+	},
+
+	/**
 	 * Holds the loaded tasks
 	 *
 	 * This is loaded once when calling the QRS REST API to
@@ -2070,11 +2129,65 @@ define([
 			}
 		},
 		restApiResponse: {
-			label: "Select a variable for storing the response of the REST call. You can use the variable to further process the response.",
+			label: "Response",
+			type: "string",
+			ref: "restApiResponse",
+			component: "dropdown",
+			options: [{
+				label: "Generic response",
+				value: "default"
+			}, {
+				label: "JSON response",
+				value: "json"
+			}],
+			defaultValue: "default",
+			show: function( item ) {
+				return showActionProperty(item, "showRestFields");
+			}
+		},
+		restApiResponseLabel: {
+			label: function( item ) {
+				var labels = {
+					"default": "Select a variable for storing the response of the REST call. Use the variable to further process the response.",
+					"json": "Define any amount of properties from the JSON response of the REST call to be stored in a variable. Lookup paths must be specified according to RFC 6901. Use the variable(s) to further process the response.",
+				};
+
+				return item.restApiResponse && labels[item.restApiResponse] || labels.default;
+			},
 			component: "text",
 			style: "hint",
 			show: function( item ) {
 				return showActionProperty(item, "showRestFields");
+			}
+		},
+		restApiResponseJson: {
+			addTranslation: "Add path",
+			type: "array",
+			ref: "restApiResponseJson",
+			itemTitleRef: function( item, index ) {
+				return item.path || "Path ".concat(index + 1);
+			},
+			allowAdd: true,
+			allowRemove: true,
+			allowMove: true,
+			items: {
+				path: {
+					translation: "scripteditor.dataconnectors.fileconnect.path",
+					type: "string",
+					expression: "optional",
+					ref: "path",
+					defaultValue: ""
+				},
+				variable: {
+					translation: "Common.Variable",
+					type: "string",
+					ref: "variable",
+					component: "dropdown",
+					options: getVariableList()
+				}
+			},
+			show: function( item ) {
+				return showActionProperty(item, "showRestFields") && "json" === item.restApiResponse;
 			}
 		},
 		variable: {
@@ -2082,27 +2195,11 @@ define([
 			type: "string",
 			ref: "variable",
 			component: "dropdown",
-			options: function() {
-				var dfd = $q.defer(),
-				    def = {
-						qVariableListDef:{
-							qType:"variable"
-						}
-					};
-
-				app.createGenericObject(def).then( function( object ) {
-					dfd.resolve(object.layout.qVariableList.qItems.map( function( b ) {
-						return {
-							value: b.qName,
-							label: 50 < b.qName.length ? b.qName.slice(0, 50).concat("&hellip;") : b.qName
-						};
-					}));
-				});
-
-				return dfd.promise;
-			},
+			options: getVariableList(),
 			show: function( item ) {
-				return showActionProperty(item, "showVariable");
+				var maybeShowRestFields = ! showActionProperty(item, "showRestFields") || (! item.restApiResponse || "default" === item.restApiResponse);
+
+				return showActionProperty(item, "showVariable") && maybeShowRestFields;
 			}
 		},
 		task: {
