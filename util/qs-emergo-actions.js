@@ -1867,20 +1867,20 @@ define([
 	 * @param  {Boolean} prop Property to signify for showing
 	 * @return {Boolean}      Show panel's property
 	 */
-	getProperty = function( item, prop ) {
+	getActionProperty = function( item, prop ) {
 		var i = _.findWhere(actionOptions.concat(navigationOptions), { value: item.action || (item.navigation && item.navigation.action) });
 		return i && i[prop];
 	},
 
 	/**
-	 * Return whether to show the panel's property
+	 * Return whether to show the panel's property for the action item
 	 *
 	 * @param  {Object}  item Action properties
 	 * @param  {Boolean} prop Property to signify for showing
 	 * @return {Boolean}      Show panel's property
 	 */
-	showProperty = function( item, prop ) {
-		return !! getProperty(item, prop);
+	showActionProperty = function( item, prop ) {
+		return !! getActionProperty(item, prop);
 	},
 
 	/**
@@ -1973,7 +1973,7 @@ define([
 			expression: "optional", // How is this parsed?
 			ref: "field",
 			show: function( item ) {
-				return showProperty(item, "showField");
+				return showActionProperty(item, "showField");
 			}
 		},
 		bookmark: {
@@ -1996,7 +1996,7 @@ define([
 				return dfd.promise;
 			},
 			show: function( item ) {
-				return showProperty(item, "showBookmark");
+				return showActionProperty(item, "showBookmark");
 			}
 		},
 		restApiLocation: {
@@ -2005,7 +2005,7 @@ define([
 			expression: "optional",
 			ref: "restApiLocation",
 			show: function( item ) {
-				return showProperty(item, "showRestFields");
+				return showActionProperty(item, "showRestFields");
 			}
 		},
 		restApiMethod: {
@@ -2026,7 +2026,7 @@ define([
 			}],
 			defaultValue: "GET",
 			show: function( item ) {
-				return showProperty(item, "showRestFields");
+				return showActionProperty(item, "showRestFields");
 			}
 		},
 		restApiHeaders: {
@@ -2057,7 +2057,7 @@ define([
 				}
 			},
 			show: function( item ) {
-				return showProperty(item, "showRestFields");
+				return showActionProperty(item, "showRestFields");
 			}
 		},
 		restApiBody: {
@@ -2066,7 +2066,7 @@ define([
 			expression: "optional",
 			ref: "restApiBody",
 			show: function( item ) {
-				return showProperty(item, "showRestFields");
+				return showActionProperty(item, "showRestFields");
 			}
 		},
 		restApiResponse: {
@@ -2074,7 +2074,7 @@ define([
 			component: "text",
 			style: "hint",
 			show: function( item ) {
-				return showProperty(item, "showRestFields");
+				return showActionProperty(item, "showRestFields");
 			}
 		},
 		variable: {
@@ -2102,7 +2102,7 @@ define([
 				return dfd.promise;
 			},
 			show: function( item ) {
-				return showProperty(item, "showVariable");
+				return showActionProperty(item, "showVariable");
 			}
 		},
 		task: {
@@ -2133,7 +2133,7 @@ define([
 				return dfd.promise;
 			},
 			show: function( item ) {
-				return showProperty(item, "showTask");
+				return showActionProperty(item, "showTask");
 			}
 		},
 		taskDisplayProgress: {
@@ -2153,7 +2153,7 @@ define([
 			}],
 			defaultValue: "",
 			show: function( item ) {
-				return showProperty(item, "showTask");
+				return showActionProperty(item, "showTask");
 			}
 		},
 		taskSkipConfirmation: {
@@ -2162,7 +2162,7 @@ define([
 			ref: "taskSkipConfirmation",
 			defaultValue: false,
 			show: function( item ) {
-				return showProperty(item, "showTask");
+				return showActionProperty(item, "showTask");
 			}
 		},
 		taskAutoResolve: {
@@ -2171,7 +2171,7 @@ define([
 			ref: "taskAutoResolve",
 			defaultValue: false,
 			show: function( item ) {
-				return showProperty(item, "showTask") || "startReload" === item.action;
+				return showActionProperty(item, "showTask") || "startReload" === item.action;
 			}
 		},
 		theme: {
@@ -2194,18 +2194,18 @@ define([
 				return dfd.promise;
 			},
 			show: function( item ) {
-				return showProperty(item, "showTheme");
+				return showActionProperty(item, "showTheme");
 			}
 		},
 		value: {
 			label: function( item ) {
-				return getProperty(item, "valueLabel") || translator.get("ExpressionEditor.Value");
+				return getActionProperty(item, "valueLabel") || translator.get("ExpressionEditor.Value");
 			},
 			type: "string",
 			expression: "optional",
 			ref: "value",
 			show: function( item ) {
-				return showProperty(item, "showValue");
+				return showActionProperty(item, "showValue");
 			}
 		},
 		state: { // Refer to propertyPanel.defaults.appearance.items.selections.items.alternateState
@@ -2231,7 +2231,7 @@ define([
 			},
 			defaultValue: "",
 			show: function( item ) {
-				return showProperty(item, "showState");
+				return showActionProperty(item, "showState");
 			}
 		},
 		sortExpression: {
@@ -2240,7 +2240,7 @@ define([
 			expression: "optional",
 			ref: "sortExpression",
 			show: function( item ) {
-				return showProperty(item, "showSortExpression");
+				return showActionProperty(item, "showSortExpression");
 			}
 		},
 		sortOrder: {
@@ -2257,12 +2257,12 @@ define([
 				value: -1
 			}],
 			show: function( item ) {
-				return showProperty(item, "showSortExpression");
+				return showActionProperty(item, "showSortExpression");
 			}
 		},
 		eitherOr: {
 			label: function( item ) {
-				return getProperty(item, "eitherOrLabel") || "";
+				return getActionProperty(item, "eitherOrLabel") || "";
 			},
 			ref: "eitherOr",
 			type: "boolean",
@@ -2300,11 +2300,11 @@ define([
 						_item = findObjByPropValue(item, "cId", _cId);
 					}
 
-					return getProperty(_item, "eitherOrOptions") || [false, true];
+					return getActionProperty(_item, "eitherOrOptions") || [false, true];
 				};
 			})(),
 			show: function( item ) {
-				var show = showProperty(item, "eitherOrOptions");
+				var show = showActionProperty(item, "eitherOrOptions");
 
 				// Hide when no fields are selected for the `clearSelection` action
 				if ("clearSelection" === item.action && ! item.field) {
@@ -2469,7 +2469,7 @@ define([
 				return dfd.promise;
 			},
 			show: function( item ) {
-				return item.navigation.enabled && showProperty(item, "showApp");
+				return item.navigation.enabled && showActionProperty(item, "showApp");
 			}
 		},
 		sheet: {
@@ -2526,7 +2526,7 @@ define([
 				return dfd.promise;
 			},
 			show: function( item ) {
-				var a = showProperty(item, "showSheet");
+				var a = showActionProperty(item, "showSheet");
 
 				if ("goToAppSheet" === item.navigation.action) {
 					a = a && !! item.navigation.app;
@@ -2541,7 +2541,7 @@ define([
 			expression: "optional",
 			ref: "navigation.value",
 			show: function( item ) {
-				return item.navigation.enabled && showProperty(item, "showValue");
+				return item.navigation.enabled && showActionProperty(item, "showValue");
 			}
 		},
 		newTab: {
@@ -2573,7 +2573,7 @@ define([
 				return dfd.promise;
 			},
 			show: function( item ) {
-				return showProperty(item, "showStory");
+				return showActionProperty(item, "showStory");
 			}
 		}
 	},
