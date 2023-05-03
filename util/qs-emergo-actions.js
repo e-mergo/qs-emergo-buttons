@@ -715,6 +715,21 @@ define([
 	},
 
 	/**
+	 * Return a value that is sanitized for setting in a variable
+	 *
+	 * @param  {Mixed} input Input value
+	 * @return {String}      Sanitized value
+	 */
+	sanitizeValueForVariable = function( input ) {
+		/**
+		 * Escape single quotes by quoting twice
+		 *
+		 * @see https://community.qlik.com/t5/Design/Escape-sequences/ba-p/1469770
+		 */
+		return (_.isObject(input) || _.isArray(input) ? JSON.stringify(input, null, "  ") : "".concat(input)).replace(/'/g, "''");
+	},
+
+	/**
 	 * Set a Variable Value
 	 *
 	 * @param  {Object}  item    Action properties
@@ -722,6 +737,7 @@ define([
 	 * @return {Promise}         Action done
 	 */
 	setVariable = function( item, context ) {
+		var isNumber = "number" === typeof item.value;
 
 		// Bail when no selections are allowed
 		if (context.options && context.options.noSelections) {
@@ -730,7 +746,7 @@ define([
 
 		// Wrap methods in `app.variable` in a promise to resolve chaining issues.
 		// `setContent` is deprecated since 2.1, use `setNumValue` or `setStringValue` instead
-		return app.variable["number" === typeof item.value ? "setNumValue" : "setStringValue"](item.variable, item.value).catch( function() {
+		return app.variable[isNumber ? "setNumValue" : "setStringValue"](item.variable, isNumber ? item.value : sanitizeValueForVariable(item.value)).catch( function() {
 			return $q.reject({ message: "Could not set the value of the variable '".concat(item.variable, "'") });
 		}).then( function() {
 			return true;
@@ -1369,12 +1385,10 @@ define([
 								var path = jsonItem.path.replace(/^\//, "").split("/").map(a => a.replace(/(~1)/g, "/")).map(a => a.replace(/(~0)/g, "~"));
 
 								return promise.then( function() {
-									var jsonValue = _.get(response.data, path);
-
 									if (jsonItem.variable) {
 										return setVariable({
 											variable: jsonItem.variable,
-											value: JSON.stringify(jsonValue, null, "  ").replace(/'/g, "''")
+											value: _.get(response.data, path)
 										}, context);
 									}
 								});
@@ -1389,12 +1403,7 @@ define([
 							if (item.variable) {
 								return setVariable({
 									variable: item.variable,
-									/**
-									 * Escape single quotes by quoting twice
-									 *
-									 * @see https://community.qlik.com/t5/Design/Escape-sequences/ba-p/1469770
-									 */
-									value: JSON.stringify(response.data, null, "  ").replace(/'/g, "''")
+									value: response.data
 								}, context);
 							}
 					}
