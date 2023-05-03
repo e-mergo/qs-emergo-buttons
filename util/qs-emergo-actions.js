@@ -1362,7 +1362,7 @@ define([
 						 *
 						 * @see https://community.qlik.com/t5/Design/Escape-sequences/ba-p/1469770
 						 */
-						value: JSON.stringify(response.data, null, "  ").replace("'", "''")
+						value: JSON.stringify(response.data, null, "  ").replace(/'/g, "''")
 					}, context);
 				} else {
 					return $q.reject({ message: "Could not retreive data from the response." });
