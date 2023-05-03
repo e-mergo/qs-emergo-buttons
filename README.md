@@ -168,9 +168,11 @@ This action sets the current Qlik Sense visual theme to the specified theme. You
 This action sends a request to a REST API. As this is a simple implementation of sending an HTTP request, interpretation of the response content is up to the developer. The response content will be parsed into a JSON string and stored in the selected variable. The following parameters of the request are configurable:
 - **Location** The URI to send the request to.
 - **Method** The HTTP method of the request.
-- **Headers** Additional HTTP headers to send with the requst.
+- **Headers** Additional HTTP headers to send with the request.
 - **Body** The optional request body. The provided string will be interpreted as a JSON object.
-- **Variable** The variable to store the response content into.
+- **Response** Handling of the response data. Options are:
+  - *Generic response* to store the entire response content into a **Variable**.
+  - *JSON response* to store any amount of properties from the JSON response following a **Path** into a **Variable**. The lookup path must be specified according to [RFC 6901](https://datatracker.ietf.org/doc/html/rfc6901).
 
 Note that when using this action in Qlik Cloud the requested resource locations need to be allowlisted in the Content Security Policy (CSP) administration section (as `connect-src`). Refer to your tenant's administrator when you have no permission to create new CSP entries.
 
