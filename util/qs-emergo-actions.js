@@ -1,7 +1,7 @@
 /**
  * E-mergo Actions Utility Library
  *
- * @version 20230503
+ * @version 20230504
  * @author Laurens Offereins <https://github.com/lmoffereins>
  *
  * @param  {Object} qlik       Qlik's core API
@@ -1373,7 +1373,7 @@ define([
 					// Consider selected response type
 					switch (item.restApiResponse) {
 						case "json":
-							return item.restApiResponseJson.reduce( function( promise, jsonItem ) {
+							return $q.all(item.restApiResponseJson.map( function( jsonItem ) {
 								/**
 								 * Convert path according to RFC 9601 for use with Underscore's `get()`
 								 * - Remove starting slash
@@ -1384,15 +1384,15 @@ define([
 								 */
 								var path = jsonItem.path.replace(/^\//, "").split("/").map(a => a.replace(/(~1)/g, "/")).map(a => a.replace(/(~0)/g, "~"));
 
-								return promise.then( function() {
-									if (jsonItem.variable) {
-										return setVariable({
-											variable: jsonItem.variable,
-											value: _.get(response.data, path)
-										}, context);
-									}
-								});
-							}, $q.resolve());
+								if (jsonItem.variable) {
+									return setVariable({
+										variable: jsonItem.variable,
+										value: _.get(response.data, path)
+									}, context);
+								} else {
+									return $q.resolve();
+								}
+							}));
 
 							break;
 
