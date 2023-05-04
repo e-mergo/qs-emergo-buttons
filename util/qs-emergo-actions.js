@@ -1348,14 +1348,31 @@ define([
 	callRestApi = function( item, context ) {
 		var dfd = $q.defer();
 
-		// Clear variable beforehand
-		if (item.variable) {
-			setVariable({
-				variable: item.variable,
-				value: ""
-			}, context).then(dfd.resolve);
-		} else {
-			dfd.resolve();
+		// Clear variables beforehand
+		switch (item.restApiResponse) {
+			case "json":
+				$q.all(item.restApiResponseJson.map( function( jsonItem ) {
+					if (jsonItem.variable) {
+						return setVariable({
+							variable: jsonItem.variable,
+							value: ""
+						}, context);
+					} else {
+						return $q.resolve();
+					}
+				})).then(dfd.resolve);
+				break;
+
+			case "default":
+			default:
+				if (item.variable) {
+					setVariable({
+						variable: item.variable,
+						value: ""
+					}, context).then(dfd.resolve);
+				} else {
+					dfd.resolve();
+				}
 		}
 
 		return dfd.promise.then( function() {
