@@ -1366,27 +1366,13 @@ define([
 		switch (item.restApiResponse) {
 			case "json":
 				$q.all(item.restApiResponseJson.map( function( jsonItem ) {
-					if (jsonItem.variable) {
-						return setVariable({
-							variable: jsonItem.variable,
-							value: ""
-						}, context);
-					} else {
-						return $q.resolve();
-					}
+					return jsonItem.variable ? setVariable({ variable: jsonItem.variable, value: "" }, context) :  $q.resolve();
 				})).then(dfd.resolve);
 				break;
 
 			case "default":
 			default:
-				if (item.variable) {
-					setVariable({
-						variable: item.variable,
-						value: ""
-					}, context).then(dfd.resolve);
-				} else {
-					dfd.resolve();
-				}
+				item.variable ? setVariable({ variable: item.variable, value: "" }, context).then(dfd.resolve) : dfd.resolve();
 		}
 
 		return dfd.promise.then( function() {
@@ -1415,14 +1401,7 @@ define([
 								 */
 								var path = jsonItem.path.replace(/^\//, "").split("/").map(a => a.replace(/(~1)/g, "/")).map(a => a.replace(/(~0)/g, "~"));
 
-								if (jsonItem.variable) {
-									return setVariable({
-										variable: jsonItem.variable,
-										value: _.get(response.data, path)
-									}, context);
-								} else {
-									return $q.resolve();
-								}
+								return jsonItem.variable ? setVariable({ variable: jsonItem.variable, value: _.get(response.data, path) }, context) : $q.resolve();
 							}));
 
 							break;
