@@ -204,8 +204,12 @@ define([
 		valueLabel: "Expression",
 		showValue: true
 	}, {
-		label: "Request confirmation",
+		label: "Request Confirmation",
 		value: "requestConfirmation"
+	}, {
+		label: "Continue or Stop",
+		value: "continueOrStop",
+		showValue: true
 	// }, {
 	// 	label: "Set Language",
 	// 	value: "setLanguage",
@@ -232,6 +236,16 @@ define([
 	 */
 	sortHypercubeByNumDesc = function( a, b ) {
 		return (a[1].qNum === b[1].qNum) ? 0 : a[1].qNum < b[1].qNum ? 1 : -1;
+	},
+
+	/**
+	 * Return a boolean from an expression's result
+	 *
+	 * @param  {String}  a Expression's result
+	 * @return {Boolean}   Does the expression evaluate to true?
+	 */
+	booleanFromExpression = function( a ) {
+		return "undefined" === typeof a || "" === a || isNaN(parseInt(a)) || !! parseInt(a);
 	},
 
 	/**
@@ -1502,6 +1516,17 @@ define([
 	},
 
 	/**
+	 * Return whether to continue or stop the action chain
+	 *
+	 * @param  {Object}  item    Action properties
+	 * @param  {Object}  context Action context or visualization scope
+	 * @return {Promise}         Action confirmed or cancelled
+	 */
+	continueOrStop = function( item, context ) {
+		return booleanFromExpression(item.value) ? $q.resolve(true) : $q.resolve(false);
+	},
+
+	/**
 	 * Set the language
 	 *
 	 * @inactive Should be used _before_ opening an app.
@@ -1547,7 +1572,8 @@ define([
 		// Other
 		callRestApi: callRestApi,
 		logToConsole: logToConsole,
-		requestConfirmation: requestConfirmation
+		requestConfirmation: requestConfirmation,
+		continueOrStop: continueOrStop
 	},
 
 	/**
