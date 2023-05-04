@@ -1420,6 +1420,13 @@ define([
 				} else {
 					return $q.reject({ message: "Could not retreive data from the response." });
 				}
+			}).then( function() {
+				var dfd = $q.defer();
+
+				// Add a small delay to allow changes in variable values to be fully realized in the Engine
+				setTimeout(dfd.resolve, 100);
+
+				return dfd.promise;
 			}).catch( function( error ) {
 				var dfd = $q.defer(), dialog;
 
