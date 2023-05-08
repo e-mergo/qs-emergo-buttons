@@ -172,15 +172,21 @@ This action sends a request to a REST API. As this is a simple implementation of
 - **Body** The optional request body. The provided string will be interpreted as a JSON object.
 - **Response** Handling of the response data. Options are:
   - *Generic response* to store the entire response content into a **Variable**.
-  - *JSON response* to store any amount of properties from the JSON response following a **Path** into a **Variable**. The lookup path must be specified according to [RFC 6901](https://datatracker.ietf.org/doc/html/rfc6901).
+  - *JSON response* to store any number of properties from the JSON response following a **Path** into a **Variable**. The lookup path must be specified according to [RFC 6901](https://datatracker.ietf.org/doc/html/rfc6901).
 
 Note that when using this action in Qlik Cloud the requested resource locations need to be allowlisted in the Content Security Policy (CSP) administration section (as `connect-src`). Refer to your tenant's administrator when you have no permission to create new CSP entries.
 
 #### Log to Console
 This action logs the result of the provided expression to the browser's console. This functionality is provided for debugging purposes.
 
-#### Request confirmation
+#### Request Confirmation
 This action displays a dialog modal requesting the user for confirmation. When the user selects 'OK' the next action will be started. When the user selects 'Cancel' the action chain will be stopped. Use this action to confirm user intent when buttons are clicked. Alternatively, the action can be used to display an information modal with limited layout options.
+
+#### Delay Execution
+This action adds a timed delay to the execution of the action chain. The duration of the delay is defined through an expression which should return a number of milliseconds (ms). When an invalid value is returned from the expression, the default delay of 1000 ms is applied.
+
+#### Continue or Terminate
+This action allows for determining whether to continue the action chain or temrinate it. Based on a measure's value, a variable's value or any other comparison, any non-empty falsey value (usually zero) will terminate the action chain. When the expression evaluates to a truthy value, the execution of actions will continue.
 
 ### Navigation
 After all triggered actions are successfully handled, a navigation action may kick in to move the user to a different location. The following navigation options are available:
@@ -222,6 +228,8 @@ Requests for additional features can be posted in the extension's GitHub reposit
 - Ready for Qlik Cloud.
 - Renamed extension label to improve discoverability in the extensions list.
 - Added the _Call REST API_ action.
+- Added the _Delay Execution_ action.
+- Added the _Continue or Terminate_ action.
 - Fixed parsing actions in between action executions, so that subsequent actions are re-evaluated with engine updates.
 - Fixed chaining actions and navigation. Broken action chains will no longer trigger navigation.
 - Fixed extension interaction and execution of actions when in noInteraction or noSelections mode.
