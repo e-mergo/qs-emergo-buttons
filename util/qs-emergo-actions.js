@@ -1,7 +1,7 @@
 /**
  * E-mergo Actions Utility Library
  *
- * @version 20230504
+ * @version 20230508
  * @author Laurens Offereins <https://github.com/lmoffereins>
  *
  * @param  {Object} qlik       Qlik's core API
@@ -207,8 +207,8 @@ define([
 		label: "Request Confirmation",
 		value: "requestConfirmation"
 	}, {
-		label: "Continue or Stop",
-		value: "continueOrStop",
+		label: "Continue or Terminate",
+		value: "continueOrTerminate",
 		showValue: true
 	// }, {
 	// 	label: "Set Language",
@@ -1502,13 +1502,13 @@ define([
 	},
 
 	/**
-	 * Return whether to continue or stop the action chain
+	 * Return whether to continue or terminate the action chain
 	 *
 	 * @param  {Object}  item    Action properties
 	 * @param  {Object}  context Action context or visualization scope
 	 * @return {Promise}         Action confirmed or cancelled
 	 */
-	continueOrStop = function( item, context ) {
+	continueOrTerminate = function( item, context ) {
 		return booleanFromExpression(item.value) ? $q.resolve(true) : $q.resolve(false);
 	},
 
@@ -1559,7 +1559,7 @@ define([
 		callRestApi: callRestApi,
 		logToConsole: logToConsole,
 		requestConfirmation: requestConfirmation,
-		continueOrStop: continueOrStop
+		continueOrTerminate: continueOrTerminate
 	},
 
 	/**
