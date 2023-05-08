@@ -207,6 +207,10 @@ define([
 		label: "Request Confirmation",
 		value: "requestConfirmation"
 	}, {
+		label: "Delay Execution",
+		value: "delayExecution",
+		showValue: true
+	}, {
 		label: "Continue or Terminate",
 		value: "continueOrTerminate",
 		showValue: true
@@ -1502,6 +1506,23 @@ define([
 	},
 
 	/**
+	 * Continue the action chain after a given delay
+	 *
+	 * @param  {Object}  item    Action properties
+	 * @param  {Object}  context Action context or visualization scope
+	 * @return {Promise}         Action confirmed
+	 */
+	delayExecution = function( item, context ) {
+		var dfd = $q.defer(),
+		    delay = parseInt(item.value);
+
+		// Resolve promise after given delay
+		setTimeout( function() { dfd.resolve(true); }, isNaN(delay) ? 1000 : delay);
+
+		return dfd.promise;
+	},
+
+	/**
 	 * Return whether to continue or terminate the action chain
 	 *
 	 * @param  {Object}  item    Action properties
@@ -1559,6 +1580,7 @@ define([
 		callRestApi: callRestApi,
 		logToConsole: logToConsole,
 		requestConfirmation: requestConfirmation,
+		delayExecution: delayExecution,
 		continueOrTerminate: continueOrTerminate
 	},
 
