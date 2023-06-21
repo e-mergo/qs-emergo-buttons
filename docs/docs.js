@@ -1,7 +1,7 @@
 /**
  * E-mergo QS Extension documentation script
  *
- * @version 20230418
+ * @version 20230621
  * @author Laurens Offereins <https://www.github.com/lmoffereins>
  */
 (function( window, $, _, factory ) {
@@ -471,7 +471,8 @@
 			// By default Qlik's interface is blocked from selecting and copying text.
 			$("#".concat(modalId, " pre")).each( function( ix, pre ) {
 				var $pre = $(pre).prepend( $("<button type='button'>".concat(translator.get("Common.Copy"), "</button>")).on("click", function() {
-					util.copyToClipboard($pre.find("code")[0].innerHTML);
+					var doc = new DOMParser().parseFromString($pre.find("code")[0].innerHTML, "text/html");
+					util.copyToClipboard(doc.documentElement.textContent);
 				}) );
 			});
 		});
