@@ -1,7 +1,7 @@
 /**
  * E-mergo Utility library
  *
- * @version 20230307
+ * @version 20230622
  *
  * @package E-mergo
  *
@@ -222,6 +222,39 @@ define([
 			get: get,
 			set: set
 		};
+	},
+
+	/**
+	 * Holds characters for line ending types
+	 *
+	 * @type {Object}
+	 */
+	lineEndingChar = {
+		"CR": "\r",
+		"LF": "\n",
+		"CRLF": "\r\n",
+		"NA": ""
+	},
+
+	/**
+	 * Return the input's (type of) line ending
+	 *
+	 * @param  {String} input Text to analyse
+	 * @param  {Boolean} returnChar Optional. Whether to return the line ending character(s). Defaults to False.
+	 * @return {String} Line ending type or character. 'NA' when not found.
+	 */
+	getLineEnding = function( input, returnChar ) {
+		var type = "NA";
+
+		if (-1 !== input.indexOf("\r\n")) {
+			type = "CRLF";
+		} else if (-1 !== input.indexOf("\r")) {
+			type = "CR";
+		} else if (-1 !== input.indexOf("\n")) {
+			type = "LF";
+		}
+
+		return returnChar ? lineEndingChar[type] : type;
 	},
 
 	/**
@@ -724,6 +757,7 @@ define([
 		copy: copy,
 		copyToClipboard: copyToClipboard,
 		createCache: createCache,
+		getLineEnding: getLineEnding,
 		hexToRgb: hexToRgb,
 		isDarkColor: isDarkColor,
 		numberFromExpression: numberFromExpression,
