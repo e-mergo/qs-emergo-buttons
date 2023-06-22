@@ -1,7 +1,7 @@
 /**
  * E-mergo QS Extension documentation script
  *
- * @version 20230621
+ * @version 20230622
  * @author Laurens Offereins <https://www.github.com/lmoffereins>
  */
 (function( window, $, _, factory ) {
@@ -59,13 +59,13 @@
 
 		attrs = attrs || {};
 
-		// Replace style when it already exists
+		// Replace link when it already exists
 		if ($link.length) {
 			$link.attr(attrs);
 
-		// Add style
+		// Add link
 		} else {
-			$("<style>").attr("id", id).attr(attrs).appendTo("head");
+			$("<link>").attr("id", id).attr(attrs).appendTo("head");
 		}
 
 		return function() {
