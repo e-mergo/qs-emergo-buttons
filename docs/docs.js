@@ -99,6 +99,39 @@
 	},
 
 	/**
+	 * Holds characters for line ending types
+	 *
+	 * @type {Object}
+	 */
+	lineEndingChar = {
+		"CR": "\r",
+		"LF": "\n",
+		"CRLF": "\r\n",
+		"NA": ""
+	},
+
+	/**
+	 * Return the input's (type of) line ending
+	 *
+	 * @param  {String} input Text to analyse
+	 * @param  {Boolean} returnChar Optional. Whether to return the line ending character(s). Defaults to False.
+	 * @return {String} Line ending type or character. 'NA' when not found.
+	 */
+	getLineEnding = function( input, returnChar ) {
+		var type = "NA";
+
+		if (-1 !== input.indexOf("\r\n")) {
+			type = "CRLF";
+		} else if (-1 !== input.indexOf("\r")) {
+			type = "CR";
+		} else if (-1 !== input.indexOf("\n")) {
+			type = "LF";
+		}
+
+		return returnChar ? lineEndingChar[type] : type;
+	},
+
+	/**
 	 * Dissect the metadata from the markdown content
 	 *
 	 * @param  {String}  md             Markdown content
@@ -106,15 +139,20 @@
 	 * @return {String}                 Stripped content
 	 */
 	stripMarkdownMetadata = function( md, returnMetadata ) {
-		var metadata = "", strippedContent = md;
+		var metadata = "",
+		    strippedContent = md,
+		    lineEnding = getLineEnding(md, true),
+		    metadataBoundsLength = 3 + lineEnding.length;
 
-		// Metadata starts at the first line with `---\r\n`
-		if (0 === md.indexOf("---\r\n")) {
-			var stripPosition = md.substring(3).indexOf("---") + 5;
+		// Metadata starts with the first line containing only '---'
+		if (0 === md.indexOf("---".concat(lineEnding))) {
+
+			// Define the position of the metadata end
+			var stripPosition = md.substring(metadataBoundsLength).indexOf("---") + metadataBoundsLength;
 
 			// Define stripped parts
-			metadata = md.substring(5, stripPosition - 1);
-			strippedContent = md.substring(stripPosition + 4);
+			metadata = md.substring(metadataBoundsLength + lineEnding.length, stripPosition - 1);
+			strippedContent = md.substring(stripPosition + metadataBoundsLength);
 		}
 
 		return returnMetadata ? metadata : strippedContent;
@@ -127,10 +165,11 @@
 	 * @return {Object}    Metadata
 	 */
 	parseMarkdownMetadata = function( md ) {
-		var obj = {}, i, metadata = stripMarkdownMetadata(md, true);
+		var obj = {}, i,
+		    metadata = stripMarkdownMetadata(md, true);
 
 		// Iterate metadata lines
-		(metadata ? metadata.split("\r\n") : []).forEach( function( value, index ) {
+		(metadata ? metadata.split(getLineEnding(md, true)) : []).forEach( function( value, index ) {
 			i = value.indexOf(":");
 			if (-1 !== i) {
 				obj[value.substring(0, i).toLowerCase()] = value.substring(i + 2);
@@ -147,7 +186,8 @@
 	 * @return {String}    Extension home url
 	 */
 	getExtensionHomeUrl = function( md ) {
-		var url = "", proxy, metadata = parseMarkdownMetadata(md);
+		var url = "", proxy,
+		    metadata = parseMarkdownMetadata(md);
 
 		if (metadata.qext) {
 			proxy = 0 === window.location.pathname.indexOf("/extensions/")
@@ -168,8 +208,9 @@
 	 */
 	getMarkdownHeadings = function( md ) {
 		var headings = [],
-		    headingRegex = /\n(#+\s*)(.*)/g,
-		    headingLevelRegex = /\n(#+\s*)/g,
+		    lineEnding = getLineEnding(md, true).replace("\\", "\\\\"),
+		    headingRegex = new RegExp(lineEnding.concat("(#+\\s*)(.*)"), "g") // /\n(#+\s*)(.*)/g,
+		    headingLevelRegex = /(#+\s*)/g,
 		    matches = md.match(headingRegex);
 
 		// Headings were found
@@ -177,7 +218,7 @@
 			headings = matches.map( function( heading ) {
 				return {
 					heading: heading,
-					level: heading.match(headingLevelRegex)[0].length - 2,
+					level: heading.match(headingLevelRegex)[0].length - 1,
 					text: heading.replace(headingLevelRegex, "")
 				};
 
@@ -197,7 +238,7 @@
 	 * @return {String}    Parsed content
 	 */
 	insertMarkdownHeadingAnchors = function( md ) {
-		var headingLevelRegex = /\n(#+)\s*/g,
+		var headingLevelRegex = /(#+)\s*/g,
 		    replacer = function( index ) {
 		    	return function( match ) {
 					return match.replace(headingLevelRegex, function( heading ) {
@@ -301,9 +342,11 @@
 	 * @return {String}    HTML content
 	 */
 	prepareContent = function( md ) {
+		var lineEnding = getLineEnding(md, true).replace("\\", "\\\\"),
+		    headingRegex = new RegExp("(".concat(lineEnding, "# \\s*.*)"), "g"); // /(\n# \s*.*)/g
 
 		// Strip h1 headings
-		md = md.replace(/(\n# \s*.*)/g, "");
+		md = md.replace(headingRegex, "");
 
 		// Add heading anchors
 		md = insertMarkdownHeadingAnchors(md);
