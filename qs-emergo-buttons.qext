@@ -3,7 +3,7 @@
 	"name": "Buttons",
 	"type": "visualization",
 	"author": "Laurens Offereins, E-mergo",
-	"version": "1.4-beta.2",
+	"version": "1.4-beta.3",
 	"description": "Buttons with advanced actions and navigation.",
 	"icon": "align-object-center",
 	"preview": "logo-emergo.png",
