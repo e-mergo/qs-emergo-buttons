@@ -1,7 +1,7 @@
 /**
  * E-mergo Utility library
  *
- * @version 20230622
+ * @version 20230707
  *
  * @package E-mergo
  *
@@ -225,39 +225,6 @@ define([
 	},
 
 	/**
-	 * Holds characters for line ending types
-	 *
-	 * @type {Object}
-	 */
-	lineEndingChar = {
-		"CR": "\r",
-		"LF": "\n",
-		"CRLF": "\r\n",
-		"NA": ""
-	},
-
-	/**
-	 * Return the input's (type of) line ending
-	 *
-	 * @param  {String} input Text to analyse
-	 * @param  {Boolean} returnChar Optional. Whether to return the line ending character(s). Defaults to False.
-	 * @return {String} Line ending type or character. 'NA' when not found.
-	 */
-	getLineEnding = function( input, returnChar ) {
-		var type = "NA";
-
-		if (-1 !== input.indexOf("\r\n")) {
-			type = "CRLF";
-		} else if (-1 !== input.indexOf("\r")) {
-			type = "CR";
-		} else if (-1 !== input.indexOf("\n")) {
-			type = "LF";
-		}
-
-		return returnChar ? lineEndingChar[type] : type;
-	},
-
-	/**
 	 * Return the RGB equivalent of a HEX coded color
 	 *
 	 * @param  {String} hex Color code in hex format
@@ -297,6 +264,40 @@ define([
 
 		return color ? ((0.299 * color.r + 0.587 * color.g + 0.114 * color.b) / 255) < 0.75 : false;
 	},
+
+	/**
+	 * Return whether the app runs in a Qlik Cloud context
+	 *
+	 * Determines context by checking app model attributes:
+	 * - layout._resourcetype
+	 * - layout.stream (not in Qlik Cloud)
+	 * - properties.ownerId
+	 *
+	 * @return {Boolean} Is the context Qlik Cloud?
+	 */
+	isQlikCloud = app.model.enigmaModel.layout.hasOwnProperty("_resourcetype")
+		&& ! app.model.enigmaModel.layout.hasOwnProperty("stream")
+		&& app.model.enigmaModel.properties.hasOwnProperty("ownerId"),
+
+	/**
+	 * Return whether the app runs in a Qlik Client Managed context
+	 *
+	 * Determines context by checking app model attributes:
+	 * - layout.stream
+	 *
+	 * @return {Boolean} Is the context Qlik Client Managed?
+	 */
+	isQlikSenseClientManaged = app.model.enigmaModel.layout.hasOwnProperty("stream"),
+
+	/**
+	 * Return whether the app runs in a Qlik Sense Desktop context
+	 *
+	 * Determines context by checking app model attributes:
+	 * - layout.create (not in Qlik Sense Desktop)
+	 *
+	 * @return {Boolean} Is the context Qlik Sense Desktop?
+	 */
+	isQlikSenseDesktop = app.model.enigmaModel.layout.hasOwnProperty("create"),
 
 	/**
 	 * Return a number from an expression's result
@@ -456,39 +457,35 @@ define([
 	requireMarkdownMimetype = function() {
 		var dfd = $q.defer();
 
-		// Check desktop vs other environments
-		app.global.isPersonalMode().then( function( resp ) {
+		// Bail when not in a Client Managed environment
+		if (! util.isQlikSenseClientManaged) {
+			dfd.resolve(true);
+			return;
+		}
 
-			// Bail when in a Desktop environment
-			if (resp.qReturn) {
-				dfd.resolve(true);
-				return;
-			}
+		// Check whether the Markdown mimetype is registered
+		qlikRequest({
+			url: "/qrs/mimetype?filter=mime so 'markdown'"
+		}).then( function( resp ) {
 
-			// Check whether the Markdown mimetype is registered
-			qlikRequest({
-				url: "/qrs/mimetype?filter=mime so 'markdown'"
-			}).then( function( resp ) {
-
-				// Create Markdown mimetype when it's not registered
-				if (! resp.data.length) {
-					qlikRequest({
-						method: "POST",
-						url: "/qrs/mimetype",
-						data: {
-							additionalHeaders: null,
-							binary: false,
-							extensions: "md,markdown",
-							mime: "text/markdown"
-						}
-					}).then( function( resp ) {
-						dfd.resolve(true);
-					}).catch(dfd.reject);
-				} else {
+			// Create Markdown mimetype when it's not registered
+			if (! resp.data.length) {
+				qlikRequest({
+					method: "POST",
+					url: "/qrs/mimetype",
+					data: {
+						additionalHeaders: null,
+						binary: false,
+						extensions: "md,markdown",
+						mime: "text/markdown"
+					}
+				}).then( function( resp ) {
 					dfd.resolve(true);
-				}
-			}).catch(dfd.reject);
-		});
+				}).catch(dfd.reject);
+			} else {
+				dfd.resolve(true);
+			}
+		}).catch(dfd.reject);
 
 		return dfd.promise;
 	},
@@ -757,9 +754,11 @@ define([
 		copy: copy,
 		copyToClipboard: copyToClipboard,
 		createCache: createCache,
-		getLineEnding: getLineEnding,
 		hexToRgb: hexToRgb,
 		isDarkColor: isDarkColor,
+		isQlikCloud: isQlikCloud,
+		isQlikSenseClientManaged: isQlikSenseClientManaged,
+		isQlikSenseDesktop: isQlikSenseDesktop,
 		numberFromExpression: numberFromExpression,
 		parseDynamicParams: parseDynamicParams,
 		qlikRequest: qlikRequest,
