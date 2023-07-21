@@ -1,29 +1,21 @@
 /**
  * E-mergo Utility library
  *
- * @version 20230707
+ * @version 20230721
  *
  * @package E-mergo
  *
- * @param  {Object} qlik                Qlik's core API
- * @param  {Object} qvangular           Qlik's Angular implementation
- * @param  {Object} $q                  Angular's promise library
- * @param  {Object} axios               Axios
- * @param  {Object} _                   Underscore
- * @param  {Object} util                Qlik's generic utility library
- * @param  {Object} arrayUtil           Qlik's array utility library
- * @param  {Object} StringNormalization Qlik's string normalization library
+ * @param  {Object} qlik      Qlik core API
+ * @param  {Object} $q        Angular promise library
+ * @param  {Object} axios     Axios
+ * @param  {Object} _         Underscore
  */
 define([
 	"qlik",
-	"qvangular",
 	"ng!$q",
 	"axios",
-	"underscore",
-	"util",
-	"general.utils/array-util",
-	"general.utils/string-normalization"
-], function( qlik, qvangular, $q, axios, _, util, arrayUtil, StringNormalization ) {
+	"underscore"
+], function( qlik, $q, axios, _ ) {
 	/**
 	 * Holds the cached data
 	 *
@@ -297,7 +289,7 @@ define([
 	 *
 	 * @return {Boolean} Is the context Qlik Sense Desktop?
 	 */
-	isQlikSenseDesktop = app.model.enigmaModel.layout.hasOwnProperty("create"),
+	isQlikSenseDesktop = ! app.model.enigmaModel.layout.hasOwnProperty("create"),
 
 	/**
 	 * Return a number from an expression's result
@@ -361,13 +353,15 @@ define([
 	},
 
 	/*
-	 * Wrapper for requests made to Qlik's QRS REST API
+	 * Wrapper for requests using Qlik's `axios` implementation
+	 *
+	 * Optimized for requests to the QRS REST API.
 	 *
 	 * @param  {Object|String} args Request data or url
 	 * @return {Promise} Request response
 	 */
 	qlikRequest = function( args ) {
-		var globalProps = app.global.session.options;
+		var globalProps = app.global.session.options || app.global.session.sessionConfig;
 
 		// When provided just the url
 		if ("string" === typeof args) {
@@ -458,9 +452,10 @@ define([
 		var dfd = $q.defer();
 
 		// Bail when not in a Client Managed environment
-		if (! util.isQlikSenseClientManaged) {
+		if (! isQlikSenseClientManaged) {
 			dfd.resolve(true);
-			return;
+
+			return dfd.promise;
 		}
 
 		// Check whether the Markdown mimetype is registered
