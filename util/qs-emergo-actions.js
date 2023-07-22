@@ -1,15 +1,16 @@
 /**
  * E-mergo Actions Utility Library
  *
- * @version 20230508
+ * @version 20230723
  * @author Laurens Offereins <https://github.com/lmoffereins>
  *
- * @param  {Object} qlik       Qlik's core API
- * @param  {Object} qvangular  Qlik's Angular implementation
- * @param  {Object} $q         Angular's promise library
+ * @param  {Object} qlik       Qlik core API
+ * @param  {Object} qvangular  Qlik Angular implementation
+ * @param  {Object} $q         Angular promise library
  * @param  {Object} axios      Axios
  * @param  {Object} _          Underscore
- * @param  {Object} translator Qlik's translation API
+ * @param  {Object} translator Qlik translation API
+ * @param  {Object} util       E-mergo utility functions
  * @return {Object}            E-mergo Actions API
  */
 define([
@@ -18,15 +19,9 @@ define([
 	"ng!$q",
 	"axios",
 	"underscore",
-	"translator"
-], function(
-	qlik,
-	qvangular,
-	$q,
-	axios,
-	_,
-	translator
-) {
+	"translator",
+	"./util"
+], function( qlik, qvangular, $q, axios, _, translator, util ) {
 
 	/**
 	 * Holds the reference to the current app's API
@@ -41,35 +36,6 @@ define([
 	 * @type {String}
 	 */
 	authenticatedUser,
-
-	/**
-	 * Wrapper for requests made to Qlik's QRS REST API
-	 *
-	 * @param  {Object|String} args Request data or url
-	 * @return {Promise}            Request response
-	 */
-	request = function( args ) {
-		var globalProps = app.global.session.options;
-
-		// When provided just the url
-		if ("string" === typeof args) {
-			args = { url: args };
-		}
-
-		// Prefix QRS calls with the proxy
-		if (0 === args.url.indexOf("/qrs") && globalProps.prefix.length) {
-			args.url = globalProps.prefix.replace(/\/+$/, "").concat(args.url);
-		}
-
-		// Default params
-		args.params = args.params || {};
-		args.headers = args.headers || {};
-
-		/**
-		 * Axios is setup by QS to handle xsrf tokens.
-		 */
-		return axios(args);
-	},
 
 	/**
 	 * Holds the set of available actions
@@ -188,7 +154,7 @@ define([
 		label: "Start Reload Task",
 		value: "startReloadTask",
 		showTask: true,
-		ifDesktop: false
+		ifServer: true
 	}, {
 		label: "Apply Theme",
 		value: "applyTheme",
@@ -1026,9 +992,7 @@ define([
 			var dfd = $q.defer();
 
 			// Check the session execution
-			request({
-				url: "/qrs/executionresult?filter=executionId eq ".concat(sessionId)
-			}).then( function( resp ) {
+			util.qlikRequest({ url: "/qrs/executionresult?filter=executionId eq ".concat(sessionId) }).then( function( resp ) {
 
 				// No access
 				if (! resp.data.length) {
@@ -1211,18 +1175,13 @@ define([
 					if (dialog.error && dialog.error.fileReferenceID) {
 
 						// Identify the script file id
-						request({
-							url: "/qrs/reloadtask/".concat(task.id, "/scriptlog?fileReferenceId=", dialog.error.fileReferenceID)
-						}).then( function( resp ) {
-
+						util.qlikRequest({ url: "/qrs/reloadtask/".concat(task.id, "/scriptlog?fileReferenceId=", dialog.error.fileReferenceID) }).then( function( resp ) {
 							/**
 							 * Download the contents of the script log
 							 *
 							 * @link https://community.qlik.com/t5/Qlik-Sense-Integration/Download-LOG-file-using-QRS-API/m-p/1567000
 							 */
-							request({
-								url: "/qrs/download/reloadtask/".concat(resp.data.value, "/", task.name, ".log")
-							}).then( function( resp ) {
+							util.qlikRequest({ url: "/qrs/download/reloadtask/".concat(resp.data.value, "/", task.name, ".log") }).then( function( resp ) {
 
 								// Trigger download for the script log as file
 								downloadTextAsFile(task.name.concat(".log"), resp.data);
@@ -1303,7 +1262,7 @@ define([
 		 * @return {Void}
 		 */
 		startTask = function( task ) {
-			request({
+			util.qlikRequest({
 				method: "POST",
 				url: "/qrs/task/".concat(task.id, "/start/synchronous")
 			}).then( function openTaskIsStartedDialog( resp ) {
@@ -1315,15 +1274,11 @@ define([
 
 		// Find the reload task. It might not be available (for the user or it was deleted)
 		if (item.task) {
-			request({
-				url: "/qrs/reloadtask/".concat(item.task)
-			}).then( function findTaskIsRunning( resp ) {
+			util.qlikRequest({ url: "/qrs/reloadtask/".concat(item.task) }).then( function findTaskIsRunning( resp ) {
 				var task = resp.data;
 
 				// Find whether the task is already running
-				request({
-					url: "/qrs/executionsession?filter=reloadTask.id eq ".concat(task.id)
-				}).then( function openConfirmReloadTaskDialog( resp ) {
+				util.qlikRequest({ url: "/qrs/executionsession?filter=reloadTask.id eq ".concat(task.id) }).then( function openConfirmReloadTaskDialog( resp ) {
 					var dialog;
 
 					// Task is already running
@@ -1380,7 +1335,7 @@ define([
 		}
 
 		return dfd.promise.then( function() {
-			return request({
+			return util.qlikRequest({
 				url: item.restApiLocation,
 				method: item.restApiMethod,
 				headers: item.restApiHeaders.reduce(function( obj, item ) {
@@ -2083,7 +2038,7 @@ define([
 			component: "dropdown",
 			ref: "action",
 			options: function() {
-				return optionsDfd.actions;
+				return optionsFilter().actions;
 			}
 		},
 		field: {
@@ -2271,9 +2226,7 @@ define([
 				var dfd = $q.defer();
 
 				if ("undefined" === typeof taskList) {
-					request({
-						url: "/qrs/reloadtask/full"
-					}).then( function( resp ) {
+					util.qlikRequest({ url: "/qrs/reloadtask/full" }).then( function( resp ) {
 						taskList = resp.data.map( function( a ) {
 							return {
 								label: a.name,
@@ -2594,7 +2547,7 @@ define([
 			component: "dropdown",
 			ref: "navigation.action",
 			options: function() {
-				return optionsDfd.navigation;
+				return optionsFilter().navigation;
 			},
 			show: function( item ) {
 				return item.navigation.enabled;
@@ -2743,69 +2696,35 @@ define([
 	optionsFilter = function() {
 
 		/**
-		 * Holds the options filter context parameters
-		 *
-		 * @type {Object}
-		 */
-		var context = {},
-
-		/**
 		 * Filter whether the option should be available
 		 *
 		 * @param {Object} option Option details
 		 * @return {Boolean} Keep the option?
 		 */
-		filter = function( option ) {
+		var filter = function( option ) {
 			var keep = true;
 
-			// Remove items based on environment
-			if (option.hasOwnProperty("ifDesktop")) {
-				keep = context.isPersonalMode === option.ifDesktop;
+			// Remove item based on environment
+			if (option.ifDesktop && ! util.isQlikSenseDesktop) {
+				keep = false;
 
 			// Remove item based on environment
-			} else if (option.hasOwnProperty("ifServer")) {
-				keep = context.isPersonalMode === (! option.ifServer);
+			} else if (option.ifServer && ! util.isQlikSenseClientManaged) {
+				keep = false;
+
+			// Remove item based on environment
+			} else if (option.ifCloud && ! util.isQlikCloud) {
+				keep = false;
 			}
 
 			return keep;
-		},
-
-		/**
-		 * Holds the Deferred for filtered `actionsOptions`
-		 *
-		 * @type {Deferred}
-		 */
-		actionsDfd = $q.defer(),
-
-		/**
-		 * Holds the Deferred for filtered `navigationOptions`
-		 *
-		 * @type {Deferred}
-		 */
-		navigationDfd = $q.defer();
-
-		// Load context parameters
-		app.global.isPersonalMode().then( function( resp ) {
-			context.isPersonalMode = resp.qReturn;
-
-		// Resolve modified option lists
-		}).then( function() {
-
-			// Filter action options
-			actionsDfd.resolve(actionOptions.filter(filter));
-
-			// Filter navigation options
-			navigationDfd.resolve(navigationOptions.filter(filter));
-		});
+		};
 
 		return {
-			actions: actionsDfd.promise,
-			navigation: navigationDfd.promise
+			actions: actionOptions.filter(filter),
+			navigation: navigationOptions.filter(filter)
 		};
 	},
-
-	// Start filtering options on load
-	optionsDfd = optionsFilter(),
 
 	/**
 	 * Run logic for mounting actions
