@@ -72,13 +72,6 @@
 	padding: 0 17px;
 }
 
-.qs-emergo-buttons .qs-emergo-buttongroup .lui-button.lui-focused .title-wrapper .title,
-.qs-emergo-buttons .qs-emergo-buttongroup .lui-button:focus .title-wrapper .title,
-.qs-emergo-buttons .qs-emergo-buttongroup .lui-button.lui-active .title-wrapper .title,
-.qs-emergo-buttons .qs-emergo-buttongroup .lui-button:active .title-wrapper .title {
-	padding: 0 16px;
-}
-
 .qs-emergo-buttons .qs-emergo-buttongroup .lui-button .lui-icon {
 	font-size: 12px;
 }
@@ -127,38 +120,36 @@
 	margin-bottom: 0px;
 }
 
-.lui-button--custom {
+.qs-emergo-buttons .qs-emergo-buttongroup .lui-button--custom {
 	border: 0;
-	padding: 1px 17px;
+	padding: 1px 0px;
 	box-shadow: inset 0 -2px rgba(0,0,0,.1);
 	transition: box-shadow .2s ease-out;
 }
 
-.lui-button--custom-inverse {
+.qs-emergo-buttons .qs-emergo-buttongroup .lui-button--custom-inverse {
 	color: #fff;
 	border: 0;
-	padding: 1px 17px;
+	padding: 1px 0px;
 	box-shadow: inset 0 -2px rgba(0,0,0,.1);
 	transition: box-shadow .2s ease-out;
 }
 
-.lui-button--custom.lui-focused, .lui-button--custom:focus,
-.lui-button--custom-inverse.lui-focused, .lui-button--custom-inverse:focus {
-	padding: 0 16px;
+.qs-emergo-buttons .qs-emergo-buttongroup .lui-button--custom.lui-focused, .lui-button--custom:focus,
+.qs-emergo-buttons .qs-emergo-buttongroup .lui-button--custom-inverse.lui-focused, .lui-button--custom-inverse:focus {
 	border: 1px solid #52a2cc;
 }
 
-.lui-button--custom.lui-active, .lui-button--custom:active,
-.lui-button--custom-inverse.lui-active, .lui-button--custom-inverse:active {
+.qs-emergo-buttons .qs-emergo-buttongroup .lui-button--custom.lui-active, .lui-button--custom:active,
+.qs-emergo-buttons .qs-emergo-buttongroup .lui-button--custom-inverse.lui-active, .lui-button--custom-inverse:active {
 	border: 1px solid transparent;
-	padding: 0 16px;
 	color: #fff;
 	background-color: rgba(0,0,0,.65) !important;
 	box-shadow: 0 1px 0 hsla(0,0%,100%,.25);
 }
 
-.lui-button--custom.lui-hovered, .lui-button--custom:hover,
-.lui-button--custom-inverse.lui-hovered, .lui-button--custom-inverse:hover {
+.qs-emergo-buttons .qs-emergo-buttongroup .lui-button--custom.lui-hovered, .lui-button--custom:hover,
+.qs-emergo-buttons .qs-emergo-buttongroup .lui-button--custom-inverse.lui-hovered, .lui-button--custom-inverse:hover {
 	box-shadow: inset 0 -2px rgba(0,0,0,.1), inset 0 0 0 250px hsla(0,0%,100%,.2);
 }
 
