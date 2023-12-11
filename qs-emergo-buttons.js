@@ -202,7 +202,9 @@ define([
 			// Style class
 			if (-1 !== ["color", "colorExpression"].indexOf(button.styleType)) {
 				var color = "color" === button.styleType ? getPaletteColor(button.color) : button[button.styleType];
-				classes.push(util.isDarkColor(color) ? "lui-button--custom-inverse" : "lui-button--custom");
+				if (color) {
+					classes.push(util.isDarkColor(color) ? "lui-button--custom-inverse" : "lui-button--custom");
+				}
 			} else if (button.style) {
 				classes.push(button.style);
 			}
@@ -222,7 +224,7 @@ define([
 			// Color
 			if ("color" === button.styleType) {
 				style["background-color"] = getPaletteColor(button.color);
-			} else if ("colorExpression" === button.styleType) {
+			} else if ("colorExpression" === button.styleType && !! button.colorExpression) {
 				style["background-color"] = button.colorExpression;
 			}
 
