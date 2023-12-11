@@ -101,9 +101,16 @@ define([
 		/**
 		 * Return the set of list styles
 		 *
-		 * @return {Array} List styles
+		 * @return {Object} List styles
 		 */
-		$scope.listStyle = buttonLayout.style(true);
+		$scope.listStyle = function() {
+			var style = buttonLayout.style(true).apply(this);
+
+			// Spacing size
+			style["--qs-emergo-buttons-spacing-size"] = "".concat(this.layout.props.buttonLayout.spacingSize || 10, "px");
+
+			return style;
+		};
 
 		/**
 		 * Return the set of list classes
@@ -216,7 +223,7 @@ define([
 		 * Return the set of button styles
 		 *
 		 * @param  {Object} button Button data
-		 * @return {Array}         Button styles
+		 * @return {Object}        Button styles
 		 */
 		$scope.btnStyle = function( button ) {
 			var style = {};

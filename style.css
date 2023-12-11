@@ -10,6 +10,7 @@
 	flex-flow: row wrap;
 	overflow-y: auto;
 	overflow-x: hidden;
+	--qs-emergo-buttons-spacing-size: 10px;
 }
 
 .qs-emergo-buttons.no-interaction {
@@ -92,32 +93,14 @@
 	flex: 1 auto;
 }
 
-.qs-emergo-buttons.horizontal.spacing .qs-emergo-buttongroup .lui-button {
-	margin: 5px;
-}
-
-.qs-emergo-buttons.horizontal.spacing .qs-emergo-buttongroup .lui-button:first-child {
-	margin-left: 0px;
-}
-
-.qs-emergo-buttons.horizontal.spacing .qs-emergo-buttongroup .lui-button:last-child {
-	margin-right: 0px;
+.qs-emergo-buttons.spacing .qs-emergo-buttongroup {
+	display: flex;
+	flex-wrap: wrap;
+	grid-gap: var(--qs-emergo-buttons-spacing-size);
 }
 
 .qs-emergo-buttons.vertical .qs-emergo-buttongroup .lui-button {
 	display: block;
-}
-
-.qs-emergo-buttons.vertical.spacing .qs-emergo-buttongroup .lui-button {
-	margin: 5px 0px;
-}
-
-.qs-emergo-buttons.vertical.spacing .qs-emergo-buttongroup .lui-button:first-child {
-	margin-top: 0px;
-}
-
-.qs-emergo-buttons.vertical.spacing .qs-emergo-buttongroup .lui-button:last-child {
-	margin-bottom: 0px;
 }
 
 .qs-emergo-buttons .qs-emergo-buttongroup .lui-button--custom {

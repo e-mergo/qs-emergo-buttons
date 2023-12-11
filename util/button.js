@@ -114,6 +114,18 @@ define([
 									value: true
 								}]
 							},
+							spacingSize: {
+								ref: "props.buttonLayout.spacingSize",
+								type: "number",
+								component: "slider",
+								min: 1,
+								max: 50,
+								step: 1,
+								defaultValue: 10,
+								show: function( layout ) {
+									return !! layout.props.buttonLayout.noSpacing;
+								}
+							},
 							position: {
 								label: "Position",
 								ref: "props.buttonLayout.position",
