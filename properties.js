@@ -102,7 +102,7 @@ define([
 			styleType: {
 				label: "Color",
 				type: "string",
-				component: "buttongroup",
+				component: "dropdown",
 				ref: "styleType",
 				options: [{
 					label: "Preset",
@@ -111,7 +111,7 @@ define([
 					label: "Picker",
 					value: "color"
 				}, {
-					label: "Expression",
+					label: "By expression",
 					value: "colorExpression"
 				}],
 				defaultValue: "style"
