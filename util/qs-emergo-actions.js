@@ -1865,8 +1865,10 @@ define([
 			return;
 		}
 
-		nav.navigation && (nav = nav.navigation);
-		nav.enabled && "function" === typeof navigation[nav.action] && navigation[nav.action](nav, context);
+		if (nav) {
+			nav.navigation && (nav = nav.navigation);
+			nav.enabled && "function" === typeof navigation[nav.action] && navigation[nav.action](nav, context);
+		}
 	},
 
 	/**
