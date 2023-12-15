@@ -11,6 +11,9 @@
 	overflow-y: auto;
 	overflow-x: hidden;
 	--qs-emergo-buttons-spacing-size: 10px;
+	--button-horizontal-padding: 17px;
+	--button-height: 30px;
+	--button-min-width: 44px;
 }
 
 .qs-emergo-buttons.no-interaction {
@@ -54,7 +57,8 @@
 .qs-emergo-buttons .qs-emergo-buttongroup .lui-button {
 	margin: 0px;
 	padding: 0px;
-	height: 30px;
+	height: var(--button-height);
+	min-width: var(--button-min-width);
 }
 
 .qs-emergo-buttons.horizontal.nospacing .qs-emergo-buttongroup .lui-button:not(:last-child) {
@@ -70,7 +74,7 @@
 
 .qs-emergo-buttons .qs-emergo-buttongroup .lui-button .title-wrapper .title {
 	flex: 1 1 auto;
-	padding: 0 17px;
+	padding: 0px var(--button-horizontal-padding);
 }
 
 .qs-emergo-buttons .qs-emergo-buttongroup .lui-button .lui-icon {

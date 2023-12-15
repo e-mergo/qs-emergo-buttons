@@ -100,6 +100,44 @@ define([
 							// 		value: 3
 							// 	}]
 							// },
+							applyPadding: {
+								label: "Custom padding",
+								ref: "props.buttonLayout.padding",
+								type: "boolean",
+								component: "switch",
+								defaultValue: false,
+								options: [{
+									translation: "properties.off",
+									value: false
+								}, {
+									translation: "properties.on",
+									value: true
+								}]
+							},
+							horizontalPadding: {
+								label: "Horizontal padding",
+								ref: "props.buttonLayout.horizontalPadding",
+								type: "number",
+								component: "slider",
+								min: 0,
+								max: 50,
+								defaultValue: 17,
+								show: function( layout ) {
+									return layout.props.buttonLayout.padding;
+								}
+							},
+							verticalPadding: {
+								label: "Vertical padding",
+								ref: "props.buttonLayout.verticalPadding",
+								type: "number",
+								component: "slider",
+								min: 0,
+								max: 50,
+								defaultValue: 0,
+								show: function( layout ) {
+									return layout.props.buttonLayout.padding;
+								}
+							},
 							spacing: {
 								label: "Apply spacing",
 								ref: "props.buttonLayout.noSpacing",
@@ -223,11 +261,31 @@ define([
 	},
 
 	/**
+	 * Return the button padding styles
+	 *
+	 * @return {Object} Padding styles
+	 */
+	buttonPadding = function() {
+		var styles = {},
+		    padding = this.layout.props.buttonLayout.padding,
+		    h = this.layout.props.buttonLayout.horizontalPadding,
+		    v = this.layout.props.buttonLayout.verticalPadding;
+
+		if (padding) {
+			styles["--button-height"]             = "".concat(v ? v * 2 + 26 : 30, "px");
+			styles["--button-min-width"]          = "auto";
+			styles["--button-horizontal-padding"] = "".concat(h || 0, "px");
+		}
+
+		return styles;
+	},
+
+	/**
 	 * Return the button style definition on a block basis
 	 *
 	 * @return {Object} Inline styles
 	 */
-	buttonStyleBlock = function() {
+	buttonPositioningBlock = function() {
 		var styles = {},
 		    width = this.layout.props.buttonLayout.width || "auto",
 		    pos = this.layout.props.buttonLayout.position || 7;
@@ -236,6 +294,7 @@ define([
 			styles.width = width;
 		}
 
+		// Parse position
 		if (pos && 7 !== pos) {
 			styles.position = "absolute";
 			switch (parseInt(pos)) {
@@ -284,11 +343,12 @@ define([
 	 *
 	 * @return {Object} Inline styles
 	 */
-	buttonStyleFlex = function() {
+	buttonPositioningFlex = function() {
 		var styles = {},
 		    width = this.layout.props.buttonLayout.width || "auto",
 		    pos = this.layout.props.buttonLayout.position || 7;
 
+		// Parse position
 		switch (parseInt(pos)) {
 			case 1:
 				styles["align-items"] = "flex-end";
@@ -334,7 +394,6 @@ define([
 		if (width && "auto" !== width) {
 			styles["justify-content"] = "space-between";
 		}
-
 
 		return styles;
 	},
@@ -426,7 +485,12 @@ define([
 		parseLabel: parseLabel,
 		class: buttonClass,
 		style: function( flex ) {
-			return flex ? buttonStyleFlex : buttonStyleBlock;
+			return function() {
+				return {
+					...(flex ? buttonPositioningFlex.apply(this) : buttonPositioningBlock.apply(this)),
+					...buttonPadding.apply(this)
+				};
+			};
 		}
 	};
 });

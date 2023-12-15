@@ -52,6 +52,7 @@ define([
 		showField: true,
 		showValue: true,
 		showState: true,
+		showSoftlock: true,
 		eitherOrLabel: "Selection type",
 		eitherOrOptions: [{
 			label: "Replace",
@@ -65,6 +66,7 @@ define([
 		value: "clearSelection",
 		showField: true,
 		showState: true,
+		showSoftlock: true,
 		eitherOrLabel: "Which field?",
 		eitherOrOptions: [{
 			label: "This",
@@ -100,6 +102,7 @@ define([
 		value: "selectAdjacent",
 		showField: true,
 		showState: true,
+		showSoftlock: true,
 		showSortExpression: true,
 		eitherOrOptions: [{
 			translation: "Tooltip.Next",
@@ -112,28 +115,33 @@ define([
 		label: "Select All Values",
 		value: "selectAll",
 		showField: true,
-		showState: true
+		showState: true,
+		showSoftlock: true
 	}, {
 		label: "Select Possible Values",
 		value: "selectPossible",
 		showField: true,
-		showState: true
+		showState: true,
+		showSoftlock: true
 	}, {
 		label: "Select Alternative Values",
 		value: "selectAlternative",
 		showField: true,
-		showState: true
+		showState: true,
+		showSoftlock: true
 	}, {
 		label: "Select Excluded Values",
 		value: "selectExcluded",
 		showField: true,
-		showState: true
+		showState: true,
+		showSoftlock: true
 	}, {
 		label: "Select Pareto Values",
 		value: "selectPareto",
 		showField: true,
 		showValue: true,
-		showState: true
+		showState: true,
+		showSoftlock: true
 	}, {
 		label: "Set Variable Value",
 		value: "setVariable",
@@ -329,7 +337,11 @@ define([
 		// Require a field name
 		if (item.field) {
 			return getField(item, state, function( field ) {
-				return field[item.eitherOr ? "toggleSelect" : "selectValues"](item.eitherOr ? String(values[0]) : values, false);
+				return field[item.eitherOr ? "toggleSelect" : "selectValues"](
+					item.eitherOr ? String(values[0]) : values,
+					item.eitherOr ? !! item.softlock : false, // Softlock for `toggleSelect`, toggle for `selectValues`
+					!! item.softlock // Softlock for `selectValues`
+				);
 			});
 		}
 	},
@@ -354,12 +366,16 @@ define([
 		// Require a field name for a single field
 		if (item.field) {
 			return getField(item, state, function( field ) {
-				return field[item.eitherOr ? (field.hasOwnProperty("clearOther") ? "clearOther" : "clearAllButThis") : "clear"]();
+				if (item.eitherOr) {
+					return field[field.hasOwnProperty("clearOther") ? "clearOther" : "clearAllButThis"](item.softlock);
+				} else {
+					return item.softlock ? field.unlock().then(() => field.clear()) : field.clear();
+				}
 			});
 
 		// Apply to all selected fields
 		} else {
-			return app.clearAll(false, state);
+			return app.clearAll(item.softlock, state);
 		}
 	},
 
@@ -471,9 +487,9 @@ define([
 							return "X" !== row[0].qState;
 						});
 
-						// Get all selected values
+						// Get all selected and locked values
 						selected = items.filter( function( row ) {
-							return "S" === row[0].qState;
+							return -1 !== ["S", "L"].indexOf(row[0].qState);
 						});
 
 						// Get selected index to start from
@@ -488,7 +504,8 @@ define([
 								? ((0 === index || -1 === index) ? items.length : index) - 1
 								// Select next value
 								: (((items.length - 1 === index || -1 === index)) ? -1 : index) + 1
-							][0]
+							][0],
+							softlock: item.softlock
 						}, context));
 					});
 				});
@@ -524,7 +541,7 @@ define([
 		// Require a field name
 		if (item.field) {
 			return getField(item, state, function( field ) {
-				return field.selectAll();
+				return field.selectAll(item.softlock);
 			});
 		}
 	},
@@ -547,7 +564,7 @@ define([
 		// Require a field name
 		if (item.field) {
 			return getField(item, state, function( field ) {
-				return field.selectExcluded();
+				return field.selectExcluded(item.softlock);
 			});
 		}
 	},
@@ -570,7 +587,7 @@ define([
 		// Require a field name
 		if (item.field) {
 			return getField(item, state, function( field ) {
-				return field.selectPossible();
+				return field.selectPossible(item.softlock);
 			});
 		}
 	},
@@ -593,7 +610,7 @@ define([
 		// Require a field name
 		if (item.field) {
 			return getField(item, state, function( field ) {
-				return field.selectAlternative();
+				return field.selectAlternative(item.softlock);
 			});
 		}
 	},
@@ -680,7 +697,8 @@ define([
 						dfd.resolve(applySelection({
 							state: state,
 							field: item.field,
-							value: selection.join(";")
+							value: selection.join(";"),
+							softlock: item.softlock
 						}, context));
 					});
 				});
@@ -2424,6 +2442,16 @@ define([
 				}
 
 				return show;
+			}
+		},
+		softlock: {
+			label: "Overwrite locked selections",
+			ref: "softlock",
+			type: "boolean",
+			component: "checkbox",
+			defaultValue: false,
+			show: function( item ) {
+				return showActionProperty(item, "showSoftlock");
 			}
 		},
 		threshold: {
