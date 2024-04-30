@@ -5,12 +5,12 @@
  * @author Laurens Offereins <https://github.com/lmoffereins>
  *
  * @param  {Object} qlik          Qlik's core API
- * @param  {Object} qUtil         Qlik utility library
  * @param  {Object} _             Underscore
  * @param  {Object} props         Property panel definition
  * @param  {Object} initProps     Initial properties
  * @param  {Object} emergoActions E-mergo Actions API
  * @param  {Object} buttonLayout  Button layout API
+ * @param  {Object} qUtil         Imported Qlik utility library
  * @param  {Object} util          E-mergo utility functions
  * @param  {String} css           Extension stylesheet
  * @param  {String} tmpl          Extension template file
@@ -18,16 +18,16 @@
  */
 define([
 	"qlik",
-	"util",
 	"underscore",
 	"./properties",
 	"./initial-properties",
 	"./util/qs-emergo-actions",
 	"./util/button",
+	"./util/qlik-util",
 	"./util/util",
 	"text!./style.css",
 	"text!./template.ng.html"
-], function( qlik, qUtil, _, props, initProps, emergoActions, buttonLayout, util, css, tmpl ) {
+], function( qlik, _, props, initProps, emergoActions, buttonLayout, qUtil, util, css, tmpl ) {
 
 	// Add global styles to the page
 	util.registerStyle("qs-emergo-buttons", css);
