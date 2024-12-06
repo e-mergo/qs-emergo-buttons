@@ -208,8 +208,11 @@ When displaying multiple buttons, the orientation determines in which direction 
 #### Width
 Select how the buttons should be sized. Either apply automatic sizing or have them cover the full width of the provided space within the extension object.
 
+#### Custom padding
+Select whether the buttons should have custom padding inside them or not. If selected, the size of the horizontal and vertical padding can be manipulated separately.
+
 #### Apply Spacing
-Select whether the buttons should have spacing around them or not.
+Select whether the buttons should have spacing around them or not. If selected, the size of the spacing can be manipulated.
 
 #### Position
 Select in which corner position the buttons should be positioned. Or center the buttons in the middle of the visualization object.
@@ -230,6 +233,8 @@ Requests for additional features can be posted in the extension's GitHub reposit
 - Added the _Call REST API_ action.
 - Added the _Delay Execution_ action.
 - Added the _Continue or Terminate_ action.
+- Added the _Override locked selections_ parameter.
+- Added the _Custom padding_ layout setting.
 - Fixed parsing actions in between action executions, so that subsequent actions are re-evaluated with engine updates.
 - Fixed chaining actions and navigation. Broken action chains will no longer trigger navigation.
 - Fixed extension interaction and execution of actions when in noInteraction or noSelections mode.
