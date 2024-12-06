@@ -100,8 +100,8 @@ define([
 							// 		value: 3
 							// 	}]
 							// },
-							applyPadding: {
-								label: "Custom padding",
+							buttonPadding: {
+								label: "Button padding",
 								ref: "props.buttonLayout.padding",
 								type: "boolean",
 								component: "switch",
@@ -114,7 +114,7 @@ define([
 									value: true
 								}]
 							},
-							horizontalPadding: {
+							horizontalButtonPadding: {
 								label: "Horizontal padding",
 								ref: "props.buttonLayout.horizontalPadding",
 								type: "number",
@@ -126,7 +126,7 @@ define([
 									return layout.props.buttonLayout.padding;
 								}
 							},
-							verticalPadding: {
+							verticalButtonPadding: {
 								label: "Vertical padding",
 								ref: "props.buttonLayout.verticalPadding",
 								type: "number",
@@ -138,8 +138,8 @@ define([
 									return layout.props.buttonLayout.padding;
 								}
 							},
-							spacing: {
-								label: "Apply spacing",
+							buttonSpacing: {
+								label: "Button spacing",
 								ref: "props.buttonLayout.noSpacing",
 								type: "boolean",
 								component: "switch",
