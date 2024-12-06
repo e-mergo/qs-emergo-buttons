@@ -57,6 +57,7 @@ define([
 			qAttributeExpressions: [],
 		},
 		showTitles: false,
-		title: JSON.parse(qext).title
+		title: JSON.parse(qext).title,
+		disableNavMenu: true
 	};
 });
