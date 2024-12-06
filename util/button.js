@@ -220,7 +220,7 @@ define([
 	buttonLabel = function() {
 		var label = this.layout.props.buttonLayout.label;
 
-		// Parse %%NUM%% - The number of values currently found in the selected dimension
+		// Parse '%%NUM%%' - The number of values currently found in the selected dimension
 		if (this.layout.qHyperCube && this.layout.qHyperCube.qDataPages[0]) {
 			label.replace("%%NUM%%", this.layout.qHyperCube.qDataPages[0].qMatrix.length);
 		}
@@ -458,7 +458,7 @@ define([
 	 */
 	iconRegexReplacer = function( type ) {
 		return function( r ) {
-			return '<i class="lui-icon lui-icon--' + r.replace(trimHashRegex, "") + ' lui-icon-' + type + '"></i>';
+			return '<i class="lui-icon lui-icon--'.concat(r.replace(trimHashRegex, ""), ' lui-icon-', type, '"></i>');
 		};
 	};
 
