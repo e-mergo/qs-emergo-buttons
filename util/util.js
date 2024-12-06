@@ -1,7 +1,7 @@
 /**
  * E-mergo Utility library
  *
- * @version 20230721
+ * @version 20241206
  *
  * @package E-mergo
  *
@@ -261,25 +261,21 @@ define([
 	 * Return whether the app runs in a Qlik Cloud context
 	 *
 	 * Determines context by checking app model attributes:
-	 * - layout._resourcetype
-	 * - layout.stream (not in Qlik Cloud)
-	 * - properties.ownerId
+	 * - layout.id (Qlik Cloud)
 	 *
 	 * @return {Boolean} Is the context Qlik Cloud?
 	 */
-	isQlikCloud = app.model.enigmaModel.layout.hasOwnProperty("_resourcetype")
-		&& ! app.model.enigmaModel.layout.hasOwnProperty("stream")
-		&& app.model.enigmaModel.properties.hasOwnProperty("ownerId"),
+	isQlikCloud = !! app.model?.enigmaModel?.layout?.hasOwnProperty("id"),
 
 	/**
 	 * Return whether the app runs in a Qlik Client Managed context
 	 *
 	 * Determines context by checking app model attributes:
-	 * - layout.stream
+	 * - layout.create (Qlik Cloud or Client Managed)
 	 *
 	 * @return {Boolean} Is the context Qlik Client Managed?
 	 */
-	isQlikSenseClientManaged = app.model.enigmaModel.layout.hasOwnProperty("stream"),
+	isQlikSenseClientManaged = (!! app.model?.enigmaModel?.layout?.hasOwnProperty("create") && ! isQlikCloud),
 
 	/**
 	 * Return whether the app runs in a Qlik Sense Desktop context
@@ -289,7 +285,7 @@ define([
 	 *
 	 * @return {Boolean} Is the context Qlik Sense Desktop?
 	 */
-	isQlikSenseDesktop = ! app.model.enigmaModel.layout.hasOwnProperty("create"),
+	isQlikSenseDesktop = ! app.model?.enigmaModel?.layout?.hasOwnProperty("create"),
 
 	/**
 	 * Return a number from an expression's result
